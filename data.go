@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-// const baseEndpoint = "https://paste.myst.rs"
-
 const (
 	BaseEndpoint string =  `https://paste.myst.rs/api/v2/`
 	DataEndpoint string =  BaseEndpoint + `data/`
@@ -37,7 +35,7 @@ func getLanguageByName(endpoint, value string) (*Language, error) {
 		log.Fatalf("%v", err)
 		return nil, err
 	}
-	
+
 	var language Language
 	err = json.Unmarshal(bytes, &language)
 	if err != nil { 
