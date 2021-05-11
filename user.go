@@ -1,4 +1,4 @@
-package main
+package pastemystgo
 
 type User struct {
 	Id              string `json:"_id"`

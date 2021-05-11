@@ -1,4 +1,4 @@
-package main
+package pastemystgo
 
 type Paste struct {
 	Id        string    `json:"_id"`

@@ -1,4 +1,4 @@
-package main
+package pastemystgo
 
 type Language struct {
 	Name       string   `json:"name"`
