@@ -23,7 +23,6 @@ const (
 )
 
 func getLanguageByName(endpoint, value string) (*Language, error) {
-	var language Language
 	
 	// Request the language from the API endpoint
 	response, err := http.Get(endpoint + value)
@@ -38,7 +37,8 @@ func getLanguageByName(endpoint, value string) (*Language, error) {
 		log.Fatalf("%v", err)
 		return nil, err
 	}
-
+	
+	var language Language
 	err = json.Unmarshal(bytes, &language)
 	if err != nil { 
 		log.Fatalf("%v", err)
@@ -49,7 +49,25 @@ func getLanguageByName(endpoint, value string) (*Language, error) {
 }
 
 func getLanguageByExtension(extension string) (*Language, error) { 
-	var language Language
 
 	response, err := http.Get(DataLanguageByExt + extension)
+	if err != nil { 
+		log.Fatalf("%v", err)
+		return nil, err
+	}
+
+	bytes, err := ioutil.ReadAll(response.Body)
+	if err != nil { 
+		log.Fatalf("%v", err)
+		return nil, err
+	}
+
+	var language Language
+	err = json.Unmarshal(bytes, &language)
+	if err != nil { 
+		log.Fatalf("%v", err)
+		return nil, err
+	}
+
+	return &language, nil
 }
