@@ -69,7 +69,7 @@ func (c *Client) Patch(url string, body interface{}) error {
 	return nil
 }
 
-func (c *Client) Delete(url string) (bool, error) { 
+func (c *Client) Delete(url string, pattern interface{}) (bool, error) { 
 	response, err := c.MakeRequest(url, DELETE, nil, nil)
 	if err != nil {
 		return false, sadness("%v", err)
@@ -102,9 +102,11 @@ func (c *Client) MakeRequest(url string, method RequestMethod, body interface{},
 		return nil, sadness("%v", err)
 	}
 
-	err = BodyToJson(response, &outPattern)
-	if err != nil {
-		return nil, sadness("%v", err)
+	if body != nil || outPattern != nil { 
+		err = BodyToJson(response, &outPattern)
+		if err != nil {
+			return nil, sadness("%v", err)
+		}
 	}
 
 	defer response.Body.Close()

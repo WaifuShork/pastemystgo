@@ -164,8 +164,9 @@ func CreatePaste(createInfo PasteCreateInfo, token string) (*Paste, error) {
 //  (error)
 func DeletePaste(id, token string) error { 
 	url := PasteEndpoint + id
+	
 	client := &Client{Token: token}
-	ok, err := client.Delete(url)
+	ok, err := client.Delete(url, &Paste{})
 
 	if !ok || err != nil {
 		return sadness("Unable to delete paste\n%v", err)

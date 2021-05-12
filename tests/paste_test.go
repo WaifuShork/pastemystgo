@@ -8,7 +8,6 @@ import (
 
 // For new pastes ensure that the max paste lifetime is 1m for courtesy of paste space.
 func TestGetPaste(t *testing.T) {
-
 	tests := []struct{
 		id    string
 		token string
@@ -43,7 +42,6 @@ func TestGetPaste(t *testing.T) {
 }
 
 func TestCreatePaste(t *testing.T) { 
-
 	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -70,7 +68,6 @@ func TestCreatePaste(t *testing.T) {
 
 func TestCreatePrivatePaste(t *testing.T) { 
 	token := os.Getenv("TOKEN")
-
 	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -101,7 +98,6 @@ func TestCreatePrivatePaste(t *testing.T) {
 
 func TestDeletePaste(t *testing.T) { 
 	token := os.Getenv("TOKEN")
-
 	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -128,7 +124,6 @@ func TestDeletePaste(t *testing.T) {
 
 func TestEditPaste(t *testing.T) { 
 	token := os.Getenv("TOKEN")
-
 	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
