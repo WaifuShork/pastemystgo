@@ -2,8 +2,9 @@ package tests
 
 import (
 	"os"
-	"pastemystgo"
 	"testing"
+
+	"github.com/WaifuShork/pastemystgo"
 )
 
 // For new pastes ensure that the max paste lifetime is 1m for courtesy of paste space.

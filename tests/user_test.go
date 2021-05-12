@@ -1,10 +1,10 @@
 package tests
 
 import (
-	"pastemystgo"
 	"testing"
-)
 
+	"github.com/WaifuShork/pastemystgo"
+)
 
 func TestUserExists(t *testing.T) {
 	user, _ := pastemystgo.UserExists("codemyst")

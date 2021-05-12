@@ -1,8 +1,9 @@
 package tests
 
 import (
-	"pastemystgo"
 	"testing"
+
+	"github.com/WaifuShork/pastemystgo"
 )
 
 func TestTimeExpiresInProperly(t *testing.T) { 
