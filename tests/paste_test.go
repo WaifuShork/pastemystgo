@@ -1,7 +1,8 @@
-package pastemystgo
+package tests
 
 import (
 	"os"
+	"pastemystgo"
 	"testing"
 )
 
@@ -27,7 +28,7 @@ func TestGetPaste(t *testing.T) {
 	}
 
 	for _, tt := range tests { 
-		paste, err := GetPaste(tt.id, tt.token)
+		paste, err := pastemystgo.GetPaste(tt.id, tt.token)
 		if err != nil { 
 			t.Error(err)
 		}
@@ -43,7 +44,7 @@ func TestGetPaste(t *testing.T) {
 
 func TestCreatePaste(t *testing.T) { 
 
-	pastyCreateInfo := []PastyCreateInfo{
+	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
 			Language: "plain text",
@@ -51,7 +52,7 @@ func TestCreatePaste(t *testing.T) {
 		},
 	}
 	
-	createInfo := PasteCreateInfo{
+	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "pastemystgotest",
 		ExpiresIn: "1d",
 		IsPrivate: false,
@@ -60,7 +61,7 @@ func TestCreatePaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 
-	paste, _ := CreatePaste(createInfo, "")
+	paste, _ := pastemystgo.CreatePaste(createInfo, "")
 
 	if paste.Title != createInfo.Title { 
 		t.Errorf("Could not create paste\n%+v\nTitle %s", paste, paste.Title)
@@ -70,7 +71,7 @@ func TestCreatePaste(t *testing.T) {
 func TestCreatePrivatePaste(t *testing.T) { 
 	token := os.Getenv("TOKEN")
 
-	pastyCreateInfo := []PastyCreateInfo{
+	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
 			Language: "plain text",
@@ -78,7 +79,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 		},
 	}
 	
-	createInfo := PasteCreateInfo{
+	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "api test paste",
 		ExpiresIn: "1d",
 		IsPrivate: true,
@@ -87,7 +88,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 	
-	paste, _ := CreatePaste(createInfo, token)
+	paste, _ := pastemystgo.CreatePaste(createInfo, token)
 
 	if paste.Title != createInfo.Title {
 		t.Errorf("Could not create paste\n%+v\nTitle %s", paste, paste.Title)
@@ -101,7 +102,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 func TestDeletePaste(t *testing.T) { 
 	token := os.Getenv("TOKEN")
 
-	pastyCreateInfo := []PastyCreateInfo{
+	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
 			Language: "plain text",
@@ -109,7 +110,7 @@ func TestDeletePaste(t *testing.T) {
 		},
 	}
 	
-	createInfo := PasteCreateInfo{
+	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "api test paste",
 		ExpiresIn: "1d",
 		IsPrivate: false,
@@ -118,8 +119,8 @@ func TestDeletePaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 	
-	paste, _ := CreatePaste(createInfo, token)
-	err := DeletePaste(paste.Id, token)
+	paste, _ := pastemystgo.CreatePaste(createInfo, token)
+	err := pastemystgo.DeletePaste(paste.Id, token)
 	if err != nil { 
 		t.Errorf("Paste was not deleted.\nPaste Id=%v\nError=\n%v", paste.Id, err)
 	}
@@ -128,7 +129,7 @@ func TestDeletePaste(t *testing.T) {
 func TestEditPaste(t *testing.T) { 
 	token := os.Getenv("TOKEN")
 
-	pastyCreateInfo := []PastyCreateInfo{
+	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
 			Language: "plain text",
@@ -136,7 +137,7 @@ func TestEditPaste(t *testing.T) {
 		},
 	}
 	
-	createInfo := PasteCreateInfo{
+	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "api test paste",
 		ExpiresIn: "1d",
 		IsPrivate: false,
@@ -145,10 +146,10 @@ func TestEditPaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 
-	paste, _ := CreatePaste(createInfo, token)
+	paste, _ := pastemystgo.CreatePaste(createInfo, token)
 	paste.Title = "edited title"
 
-	newPaste, _ := EditPaste(*paste, token)
+	newPaste, _ := pastemystgo.EditPaste(*paste, token)
 	if newPaste.Title != "edited title" {
 		t.Errorf("Paste was not edited")
 	}

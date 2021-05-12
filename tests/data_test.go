@@ -1,6 +1,7 @@
-package pastemystgo
+package tests
 
 import (
+	"pastemystgo"
 	"testing"
 )
 
@@ -22,7 +23,7 @@ func TestGetLanguage(t *testing.T) {
 	}
 
 	for _, tt := range tests { 
-		language, err := GetLanguageByName(DataLanguageByName, tt)
+		language, err := pastemystgo.GetLanguageByName(pastemystgo.DataLanguageByName, tt)
 		if err != nil {
 			t.Errorf("Something went wrong\nError:%v\n%s", err, tt)
 		}
@@ -45,7 +46,7 @@ func TestGetLanguageByExtension(t *testing.T) {
 	}
 	
 	for _, tt := range tests {
-		language, err := GetLanguageByExtension(tt)
+		language, err := pastemystgo.GetLanguageByExtension(tt)
 		if err != nil {
 			t.Errorf("An error occurred.\n%v", err)
 		}
