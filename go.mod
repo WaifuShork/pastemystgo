@@ -1,3 +1,3 @@
-module github.com/WaifuShork/pastemystgo
+module github.com/waifushork/pastemystgo
 
 go 1.16
