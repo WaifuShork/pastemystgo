@@ -38,7 +38,7 @@ func TestGetLanguage(t *testing.T) {
 	}
 }
 
-// TODO: Solidify security of test.
+// TODO: Solidify security of test. ()
 func TestGetLanguageByExtension(t *testing.T) { 
 	tests := []string { 
 		"c",
