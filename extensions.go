@@ -1,19 +1,27 @@
 package pastemystgo
 
+// A collection of extension tools used throughout the pastemystgo library
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 )
 
-// A helper function which wraps Unmarshal for readability
-func deserializeJson(bytes []byte, v interface{}) (error) {
+// A helper function which wraps json.Unmarshal for readability
+//
+// Returns:
+//  ([]byte, error)
+func DeserializeJson(bytes []byte, v interface{}) (error) {
 	return json.Unmarshal(bytes, &v)
 }
 
-// A helper function which wraps MarshalIndent and Marshal for readability
+
+// A helper function which wraps json.MarshalIndent and json.Marshal for readability
 // providing the user with a choice to indent or not.
-func serializeJson(v interface{}, isIndented bool) ([]byte, error) {
+//
+// Returns:
+//  ([]byte, error)
+func SerializeJson(v interface{}, isIndented bool) ([]byte, error) {
 	if isIndented {
 		return json.MarshalIndent(&v, "", "    ")
 	} else { 
@@ -21,8 +29,12 @@ func serializeJson(v interface{}, isIndented bool) ([]byte, error) {
 	}
 }
 
-// Pretty much a joke function for returning errors
-func sadness(message string, err ...error) error {
-	errorMessage := fmt.Sprintf(message, err)
+// Wraps errors.New(error) so you can easily throw a new error without 
+// dealing with formatting a message before feeding it to the method.
+//
+// Returns:
+//  error
+func sadness(message string, err ...interface{}) error {
+	errorMessage := fmt.Sprintf(message, err...)
 	return errors.New(errorMessage)
 }

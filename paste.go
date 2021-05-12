@@ -6,13 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
 // Represents an enumeration of expiration values
 // GetExpiresInString(expiresIn ExpiresIn)(string)
 // will return the string format of expiration
+// All possible expiration values
 type ExpiresIn int
 const (
 	Never ExpiresIn = iota
@@ -26,70 +26,101 @@ const (
 	OneYear
 )
 
+// Represents a single paste, containing all edits and pasties attached
 type Paste struct {
-	Id        string    `json:"_id"`
-	OwnerId   string    `json:"ownerId"`
-	Title     string    `json:"title"`
-	CreatedAt uint64    `json:"createdAt"`
-	ExpiresIn string    `json:"expiresIn"`
-	DeletesAt uint64    `json:"deletesAt"`
-	Stars     uint64    `json:"stars"`
-	IsPrivate bool      `json:"isPrivate"`
-	IsPublic  bool      `json:"isPublic"`
-	Tags      []string  `json:"tags"`
-	Pasties   []Pasty   `json:"pasties"`
-	Edits     []Edit    `json:"edits"`
+	// Paste Id
+	Id          string    `json:"_id"`
+	// Owner of the paste, if none then will be " "
+	OwnerId     string    `json:"ownerId"`
+	// Title of the paste
+	Title       string    `json:"title"`
+	// Date in unix time when the paste was created
+	CreatedAt   uint64    `json:"createdAt"`
+	// When the paste expires
+	ExpiresIn   string    `json:"expiresIn"`
+	// Date in unix time when the paste will be deleted
+	DeletesAt   uint64    `json:"deletesAt"`
+	// Amount of stars the paste has
+	Stars       uint64    `json:"stars"`
+	// Is the paste private?
+	IsPrivate   bool      `json:"isPrivate"`
+	// Is the paste public?
+	IsPublic    bool      `json:"isPublic"`
+	// Is the paste encrypted?
+	IsEncrypted bool      `json:"encrypted"`
+	// Slices of all tags for this paste
+	Tags        []string  `json:"tags"`
+	// Slice of all the pasties on the paste
+	Pasties     []Pasty   `json:"pasties"`
+	// Slice of all edits
+	Edits       []Edit    `json:"edits"`
 }
-
+// Represents a single pasty, could also be perceived as a "file" 
+// on the PasteMyst website, contains language, code, and title.
 type Pasty struct {
+	// Id of the pasty
 	Id       string `json:"_id"`
-	Language string `json:"language"`
+	// Title of the pasty
 	Title    string `json:"title"`
+	// Language of the pasty
+	Language string `json:"language"`
+	// Code of the pasty
 	Code     string `json:"code"`
 }
 
+// Holds information about a given edit based in 'id'
 type Edit struct {
+	// Unique id of the edit
 	Id       string   `json:"_id"`
+	// Edit id, multiple edits can share the same id
+	// to show that multiple properties were edited
+	// at the same time
 	EditId   string   `json:"editId"`
+	// Type of edit (incomplete)
 	EditType uint64   `json:"editType"`
+	// Various metadata, most used case - storing which pasty was edited
 	Metadata []string `json:"metadata"`
+	// The actual data of the edit, typically stores old data
 	Edit     string   `json:"edit"`
+	// Unix time of when the edit was executed
 	EditedAt uint64   `json:"editedAt"`
 }
 
-/*type EditType int
-
-const (
-	Title EditType = iota
-	PastyTitle
-	PastyLanguage
-	PastyContent
-	PastyAdded
-	PastyRemoved
-)*/
-
+// Information needed to created a new pasty
 type PastyCreateInfo struct { 
+	// Title of pasty
 	Title    string `json:"title"`
+	// Language of the pasty, stores the name of the language,
+	// not the mode or MIME type.
 	Language string `json:"language"`
+	// Code of the pasty
 	Code     string `json:"code"`
 }
 
+// Information needed to create a new paste
 type PasteCreateInfo struct { 
-	Title     string `json:"title"`
-	ExpiresIn string `json:"expiresIn"`
-	IsPrivate bool   `json:"isPrivate"`
-	IsPublic  bool   `json:"isPublic"`
-	Tags      string `json:"tags"`
+	// Title -- optional
+	Title     string            `json:"title"`
+	// ExpiresIn -- optional
+	ExpiresIn string            `json:"expiresIn"`
+	// Is it accessible by the owner? -- optional
+	IsPrivate bool              `json:"isPrivate"`
+	// Is it displayed on the owners public profile? -- optional
+	IsPublic  bool              `json:"isPublic"`
+	// Tags, comma separated -- optional
+	Tags      string            `json:"tags"`
+	// List of pasties -- mandatory
 	Pasties   []PastyCreateInfo `json:"pasties"`
 }
 
-// Token is allowed to be nil for when not passed
+// Gets a paste based on Id, a token is mandatory for accessing private pastes
+//  
+// Returns:
+//  (*Paste, error)
 func GetPaste(id string, token string) (*Paste, error) {
-
-	// Request the language from the API endpoint
 	response, err := http.Get(PasteEndpoint + id)
 	if err != nil {
-		return nil, sadness("Error getting endpoint Response\n%v", err)
+		return nil, sadness("Error getting Endpoint Response\n%v", err)
 	}
 
 	// Ensure that the status is found, otherwise there's no reason to continue
@@ -109,18 +140,21 @@ func GetPaste(id string, token string) (*Paste, error) {
 	}
 
 	var paste Paste
-	//err = json.Unmarshal(bytes, &paste)
-	err = deserializeJson(bytes, &paste)
+	err = DeserializeJson(bytes, &paste)
 	if err != nil {
 		return nil, sadness("Error Deserializing the Response Body\n%v", err)
 	}
 
+	defer response.Body.Close()
 	return &paste, nil
 }
 
 // Creates a new paste with the given PasteCreateInfo
+// 
 // Posts new pastes to (https://paste.myst.rs/api/v2/paste)
-// Returns Paste and an error if applicable
+//  
+// Returns:
+//  (*Paste, error)
 func CreatePaste(createInfo PasteCreateInfo, token string) (*Paste, error) { 	
 	// There's no sense bothering with anything else if these checks fail
 	// IsPrivate, IsPublic, and Tags are related to account features, if no token is passed
@@ -153,23 +187,33 @@ func CreatePaste(createInfo PasteCreateInfo, token string) (*Paste, error) {
 	if err != nil { 
 		return nil, sadness("Unable to DO request.\n%v", err)
 	}
-	defer response.Body.Close()
 
 	// Read the responses body to get the raw text
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, sadness("Error reading Response Body\n%v", err)
+		return nil, sadness("Error reading Response Body.\n%v", err)
 	}
 
 	var paste Paste
-	err = json.Unmarshal(bytes, &paste)
+	err = DeserializeJson(bytes, &paste)
 	if err != nil {
-		return nil, sadness("Error Unmarshalling the Response Body\n%v", err)
+		return nil, sadness("Error deserializing the Response Body.\n%v", err)
 	}
 
+	defer response.Body.Close()
 	return &paste, nil
 }
 
+// Deletes a paste with a specified account token -- mandatory
+//
+// You can only delete pastes on the account of the token that has been passed.
+// 
+// A token is required for deleting a paste because this is an account feature.
+// 
+// This action is irreversible.
+//  
+// Returns:
+//  (error)
 func DeletePaste(id, token string) error { 
 	url := PasteEndpoint + id
 	request, err := http.NewRequest("DELETE", url, nil)
@@ -186,11 +230,22 @@ func DeletePaste(id, token string) error {
 	if err != nil { 
 		sadness("Unable to DO request.\n%v", err)
 	}
-	//log.Fatal(response.Body)
+
 	defer response.Body.Close()
 	return nil
 }
 
+// Edits a paste with a specified account token -- mandatory
+//
+// You can only edit pastes on the account of the token that has been passed.
+// 
+// A token is required for editing a paste because this is an account feature.
+// 
+// To edit values of a paste you must send back the exact same paste except with the 
+// adjusted values, you cannot edit expiration date, any result will have no effect.
+//  
+// Returns:
+//  (*Paste, error)
 func EditPaste(paste Paste, token string) (*Paste, error) { 
 	// url for where the paste will go
 	url := PasteEndpoint + paste.Id
@@ -208,10 +263,9 @@ func EditPaste(paste Paste, token string) (*Paste, error) {
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil { 
-		log.Fatal(err)
+		return nil, sadness("%v", err)
 	}
 
-	// Close body.
 	defer response.Body.Close()
 	return &paste, nil
 }

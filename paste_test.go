@@ -1,10 +1,10 @@
 package pastemystgo
 
 import (
+	"os"
 	"testing"
 )
 
-var token string = ""
 
 func TestGetPaste(t *testing.T) {
 
@@ -68,6 +68,8 @@ func TestCreatePaste(t *testing.T) {
 }
 
 func TestCreatePrivatePaste(t *testing.T) { 
+	token := os.Getenv("TOKEN")
+
 	pastyCreateInfo := []PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -84,7 +86,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 		Tags:      "",
 		Pasties: pastyCreateInfo,
 	}
-
+	
 	paste, _ := CreatePaste(createInfo, token)
 
 	if paste.Title != createInfo.Title {
@@ -96,10 +98,9 @@ func TestCreatePrivatePaste(t *testing.T) {
 	}
 }
 
-// TODO: This won't work til paste creation
 func TestDeletePaste(t *testing.T) { 
-	// TODO: lol remove this bitch
-	
+	token := os.Getenv("TOKEN")
+
 	pastyCreateInfo := []PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -125,5 +126,30 @@ func TestDeletePaste(t *testing.T) {
 }
 
 func TestEditPaste(t *testing.T) { 
+	token := os.Getenv("TOKEN")
 
+	pastyCreateInfo := []PastyCreateInfo{
+		{
+			Title: "pasty1",
+			Language: "plain text",
+			Code: "asd asd asd",
+		},
+	}
+	
+	createInfo := PasteCreateInfo{
+		Title:     "api test paste",
+		ExpiresIn: "never",
+		IsPrivate: false,
+		IsPublic:  false,
+		Tags:      "",
+		Pasties: pastyCreateInfo,
+	}
+
+	paste, _ := CreatePaste(createInfo, token)
+	paste.Title = "edited title"
+
+	newPaste, _ := EditPaste(*paste, token)
+	if newPaste.Title != "edited title" {
+		t.Errorf("Paste was not edited")
+	}
 }

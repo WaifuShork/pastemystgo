@@ -30,8 +30,6 @@ func ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint64, error) {
 	}
 
 	return uint64(pattern["result"]), nil
-
-	//return &language, nil
 }
 
 func GetExpiresInString(expiresIn ExpiresIn) string { 
