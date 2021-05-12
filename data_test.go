@@ -31,18 +31,31 @@ func TestGetLanguage(t *testing.T) {
 			t.Error("Unable to requested language.")
 		}
 		if language.Name != tt { 
-			t.Errorf("Unable to get language '%v'. got=%v", tt, language.Name)
+			t.Errorf("Unable to get language '%s'.\nGot=%s", tt, language.Name)
 		}
 	}
 }
 
+// TODO: Solidify security of test.
 func TestGetLanguageByExtension(t *testing.T) { 
-	language, err := GetLanguageByExtension("c")
-	if err != nil {
-		t.Error("Something went wrong")
+	tests := []string { 
+		"c",
+		"go",
+		"cs",
 	}
+	
+	for _, tt := range tests {
+		language, err := GetLanguageByExtension(tt)
+		if err != nil {
+			t.Errorf("An error occurred.\n%v", err)
+		}
+	
+		if language == nil {
+			t.Error("Language was nil.")
+		}
 
-	if language == nil {
-		t.Error("Unable to requested language.")
+		if language.Extensions[0] != tt { 
+			t.Errorf("Unable to get language:\nGot=%s\nExpected=%s", language.Name, tt)
+		}
 	}
 }

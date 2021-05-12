@@ -1,8 +1,6 @@
 package pastemystgo
 
 import (
-	"io/ioutil"
-	"net/http"
 	"net/url"
 )
 
@@ -31,36 +29,31 @@ const (
 // BUG(r): Some languages will not return properly, and will error out.
 func GetLanguageByName(endpoint, value string) (*Language, error) {
 	// Request the language from the API endpoint
-	response, err := http.Get(endpoint + url.QueryEscape(value))
-	if err != nil { 
-		return nil, err
-	}
+	url := endpoint + url.QueryEscape(value)
+	client := &Client{}
+
 	var language Language
-
-	// Read the responses body to get the raw text 
-	bytes, err := ioutil.ReadAll(response.Body)
-	if err != nil { 
-		return nil, err
-	}
-
-	err = DeserializeJson(bytes, &language)
-	// err = json.Unmarshal(bytes, &language)
-	if err != nil { 
-		return nil, err
+	
+	err := client.Get(url, &language)
+	if err != nil {
+		return nil, sadness("%v", err)
 	}
 
 	return &language, nil
 }
 
-// Gets a language based on its extension:
-//
-// Wraps GetLanguageByName() to get the given language based on any
-// extension that is applicable to the language.
+// Gets a language based on its extension
 //
 // Returns:
 //  (*Language, error)
 // BUG(r): Some languages will not return properly, and will error out.
 func GetLanguageByExtension(extension string) (*Language, error) { 
+	var language Language
+	client := &Client{}
+	err := client.Get(DataLanguageByExt + extension, &language)
+	if err != nil { 
+		return nil, sadness("%v", err)
+	}
 
-	return GetLanguageByName(DataLanguageByExt, extension)
+	return &language, err
 }

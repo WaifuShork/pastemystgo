@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-
+// For new pastes ensure that the max paste lifetime is 1m for courtesy of paste space.
 func TestGetPaste(t *testing.T) {
 
 	tests := []struct{
@@ -52,8 +52,8 @@ func TestCreatePaste(t *testing.T) {
 	}
 	
 	createInfo := PasteCreateInfo{
-		Title:     "api test paste",
-		ExpiresIn: "never",
+		Title:     "pastemystgotest",
+		ExpiresIn: "1d",
 		IsPrivate: false,
 		IsPublic:  false,
 		Tags:      "",
@@ -80,7 +80,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 	
 	createInfo := PasteCreateInfo{
 		Title:     "api test paste",
-		ExpiresIn: "never",
+		ExpiresIn: "1d",
 		IsPrivate: true,
 		IsPublic:  false,
 		Tags:      "",
@@ -111,7 +111,7 @@ func TestDeletePaste(t *testing.T) {
 	
 	createInfo := PasteCreateInfo{
 		Title:     "api test paste",
-		ExpiresIn: "never",
+		ExpiresIn: "1d",
 		IsPrivate: false,
 		IsPublic:  false,
 		Tags:      "",
@@ -138,7 +138,7 @@ func TestEditPaste(t *testing.T) {
 	
 	createInfo := PasteCreateInfo{
 		Title:     "api test paste",
-		ExpiresIn: "never",
+		ExpiresIn: "1d",
 		IsPrivate: false,
 		IsPublic:  false,
 		Tags:      "",

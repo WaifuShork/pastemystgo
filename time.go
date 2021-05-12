@@ -1,12 +1,16 @@
 package pastemystgo
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
+// Returns the created at time in unix format. Will error out and return 0 if the
+// request was malformed.
+//
+// Returns:
+//  (uint64, error)
 func ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint64, error) {
 	expiresIn := GetExpiresInString(expires)
 	url := TimeExpiresInToUnix + fmt.Sprintf("?createdAt=%d&expiresIn=%s", createdAt, expiresIn)
@@ -19,19 +23,25 @@ func ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint64, error) {
 	// Read the responses body to get the raw text 
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil { 
-		return 0, sadness("%v", err)
+		return 0, sadness("%s", err)
 	}
 
+	// Pattern of the value to locate from the response.Body bytes 
 	var pattern map[string]float64
-
-	err = json.Unmarshal(bytes, &pattern)
+	err = DeserializeJson(bytes, &pattern)
 	if err != nil { 
-		return 0, sadness("%v", err)
+		return 0, sadness("%s", err)
 	}
 
 	return uint64(pattern["result"]), nil
 }
 
+// Gets the string value of ExpiresIn input. 
+//
+// Will return "" if the method is unable to locate your request. 
+//
+// Returns:
+//  (string)
 func GetExpiresInString(expiresIn ExpiresIn) string { 
 	switch expiresIn {
 	case Never:

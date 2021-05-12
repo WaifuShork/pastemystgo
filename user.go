@@ -1,7 +1,6 @@
 package pastemystgo
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -48,24 +47,10 @@ func UserExists(username string) (bool, error) {
 func GetUser(username string) (*User, error) {
 	var user User
 	url := UserEndpoint + url.QueryEscape(username)
-
-	request, err := http.Get(url)
+	client := &Client{}
+	err := client.Get(url, &user)
 	if err != nil { 
 		return nil, sadness("%v", err)
-	}
-
-	if request.StatusCode != http.StatusNotFound {
-		// Read the responses body to get the raw text
-		bytes, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			return nil, sadness("Error reading Request Body.\n%v", err)
-		}
-
-		err = DeserializeJson(bytes, &user)
-		if err != nil {
-			return nil, sadness("Error deserializing the Request Body.\n%v", err)
-		}
-		return &user, nil
 	}
 
 	return &user, nil

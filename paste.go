@@ -1,12 +1,7 @@
 package pastemystgo
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 )
 
 // Represents an enumeration of expiration values
@@ -118,34 +113,15 @@ type PasteCreateInfo struct {
 // Returns:
 //  (*Paste, error)
 func GetPaste(id string, token string) (*Paste, error) {
-	response, err := http.Get(PasteEndpoint + id)
-	if err != nil {
-		return nil, sadness("Error getting Endpoint Response\n%v", err)
-	}
-
-	// Ensure that the status is found, otherwise there's no reason to continue
-	if response.StatusCode == http.StatusNotFound {
-		// Print out the type for a prettier error code view.
-		return nil, sadness("Incorrect Status Code: (%+t)", errors.New(fmt.Sprintf("%T", response.StatusCode)))
-	}
-
-	if token != "" { 
-		response.Request.Header.Add("Authorization", token)
-	}
-
-	// Read the responses body to get the raw text
-	bytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, sadness("Error reading Response Body\n%v", err)
-	}
+	url := PasteEndpoint + id
+	client := &Client{Token: token}
 
 	var paste Paste
-	err = DeserializeJson(bytes, &paste)
+	err := client.Get(url, &paste)
 	if err != nil {
-		return nil, sadness("Error Deserializing the Response Body\n%v", err)
+		return nil, sadness("%v", err)
 	}
 
-	defer response.Body.Close()
 	return &paste, nil
 }
 
@@ -165,42 +141,14 @@ func CreatePaste(createInfo PasteCreateInfo, token string) (*Paste, error) {
 
 	// url for where the paste will go
 	url := BaseEndpoint + "paste/"
-	 
-	jsonBody := &bytes.Buffer{}
-	json.NewEncoder(jsonBody).Encode(&createInfo)
-
-	// The bytes are correct
-	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody.Bytes()))
-	if err != nil { 
-		return nil, sadness("Unable to POST request.")
-	}
-
-	// Add headers 
-	request.Header.Add("Content-Type", "application/json")
-	if token != "" {
-		request.Header.Add("Authorization", token)
-	}
-
-	// Finish request
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil { 
-		return nil, sadness("Unable to DO request.\n%v", err)
-	}
-
-	// Read the responses body to get the raw text
-	bytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, sadness("Error reading Response Body.\n%v", err)
-	}
+	client := &Client{Token: token} 
 
 	var paste Paste
-	err = DeserializeJson(bytes, &paste)
-	if err != nil {
-		return nil, sadness("Error deserializing the Response Body.\n%v", err)
+	err := client.Post(url, createInfo, &paste)
+	if err != nil { 
+		return nil, sadness("%v", err)
 	}
-
-	defer response.Body.Close()
+	
 	return &paste, nil
 }
 
@@ -216,22 +164,13 @@ func CreatePaste(createInfo PasteCreateInfo, token string) (*Paste, error) {
 //  (error)
 func DeletePaste(id, token string) error { 
 	url := PasteEndpoint + id
-	request, err := http.NewRequest("DELETE", url, nil)
-	if err != nil { 
-		return sadness("Unable to delete given paste\n%v", err)
+	client := &Client{Token: token}
+	ok, err := client.Delete(url)
+
+	if !ok || err != nil {
+		return sadness("Unable to delete paste\n%v", err)
 	}
 
-	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("Authorization", token)
-
-	// Finish request
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil { 
-		sadness("Unable to DO request.\n%v", err)
-	}
-
-	defer response.Body.Close()
 	return nil
 }
 
@@ -249,23 +188,12 @@ func DeletePaste(id, token string) error {
 func EditPaste(paste Paste, token string) (*Paste, error) { 
 	// url for where the paste will go
 	url := PasteEndpoint + paste.Id
-	
-	jsonBytes := &bytes.Buffer{}
-	json.NewEncoder(jsonBytes).Encode(&paste)
+	client := &Client{Token: token}
 
-	// The bytes are correct
-	request, err := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonBytes.Bytes()))
-	if err != nil { 
-		return nil, sadness("Error on POST\n%v", err)
-	}
-
-	// Finish request
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil { 
+	err := client.Patch(url, &paste)
+	if err != nil {
 		return nil, sadness("%v", err)
 	}
 
-	defer response.Body.Close()
 	return &paste, nil
 }
