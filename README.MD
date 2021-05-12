@@ -11,8 +11,10 @@
     </a>
 </h1>
 
+<p align="center">
 A small, fast, reliable pastemyst API wrapper written in Golang. </br>
 Official pastemyst API docs found <a href="https://paste.myst.rs/api-docs/index">here</a>. If you'd like enhanced documentation please visit my <a href="https://paste.myst.rs/sewevxee">collection of pastes</a>
+</p>
 
 <h2> 
 Data
