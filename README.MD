@@ -17,7 +17,6 @@ Official pastemyst API docs found <a href="https://paste.myst.rs/api-docs/index"
 <h2> 
 Data
 </h2>
-<h1></h1>
 
 ```go
 // Get language by name
@@ -39,7 +38,6 @@ fmt.Println(language.Name)
 <h2> 
 Time
 </h2>
-<h1></h1>
 
 ```go
 // Get the time till expiration in Unix time format
@@ -54,7 +52,6 @@ fmt.Printf("%d", time)
 <h2> 
 User
 </h2>
-<h1></h1>
 
 ```go
 // Check whether a user exists
@@ -77,7 +74,6 @@ fmt.Println(user.Username)
 <h2> 
 Paste
 </h2>
-<h1></h1>
 
 ```go
 // Getting a paste
