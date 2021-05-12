@@ -1,5 +1,7 @@
 <p align="center">
-    <img width="450" src="logo.svg" alt="Logo" /><br>
+    <a href="https://paste.myst.rs/">
+        <img width="450" src="logo.svg" alt="Logo" /><br>
+    </a>
 </p>
 
 <h1 align="center"> 
