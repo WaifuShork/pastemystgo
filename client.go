@@ -65,7 +65,7 @@ func (c *Client) post(url string, body interface{}, pattern interface{}) error {
 	return nil
 }
 
-func (c *Client) patch(url string, body interface{}) error {
+func (c *Client) patch(url string, body interface{}) (error) {
 	response, err := c.makeRequest(url, PATCH, body, nil)
 	if err != nil { 
 		return sadness("%v", err)

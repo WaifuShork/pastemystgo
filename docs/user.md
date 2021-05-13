@@ -41,6 +41,20 @@ if err != nil {
 }
 ```
 
+Get user with a username:
+```go
+func (c *Client) TryGetUser(username string) (*User, bool, error)
+```
+```go
+func (c *Client) GetUser(username string) (*User, error)
+```
+```go
+user, err := client.GetUser("waifushork")
+if err != nil {
+    panic(err)
+}
+```
+
 <h2>Important Remarks</h2>
 
 A user must have a public account to be located or retrieved.

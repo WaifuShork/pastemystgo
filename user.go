@@ -55,3 +55,18 @@ func (c *Client) GetUser(username string) (*User, error) {
 
 	return &user, nil
 }
+
+// Attempts to get a user by their username
+//
+// User will be nil if they don't have a public profile yet. 
+//  
+// Returns:
+//  (*User, bool, error)
+func (c *Client) TryGetUser(username string) (*User, bool, error) { 
+	user, err := c.GetUser(username)
+	if err != nil { 
+		return nil, false, sadness("%v", err)
+	}
+
+	return user, true, nil
+}
