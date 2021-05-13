@@ -32,7 +32,7 @@ func (c *Client) UserExists(username string) (bool, error) {
 
 	request, err := http.Get(url)
 	if err != nil { 
-		return false, sadness("%v", err)
+		return false, newError(err)
 	}
 
 	return request.StatusCode == http.StatusOK, nil
@@ -50,7 +50,7 @@ func (c *Client) GetUser(username string) (*User, error) {
 	client := &Client{}
 	err := client.get(url, &user)
 	if err != nil { 
-		return nil, sadness("%v", err)
+		return nil, newError(err)
 	}
 
 	return &user, nil
@@ -65,7 +65,7 @@ func (c *Client) GetUser(username string) (*User, error) {
 func (c *Client) TryGetUser(username string) (*User, bool, error) { 
 	user, err := c.GetUser(username)
 	if err != nil { 
-		return nil, false, sadness("%v", err)
+		return nil, false, newError(err)
 	}
 
 	return user, true, nil

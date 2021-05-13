@@ -17,20 +17,20 @@ func (c *Client) ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint6
 
 	response, err := http.Get(url)
 	if err != nil {
-		return 0, sadness("%v", err)
+		return 0, newError(err)
 	}
 
 	// Read the responses body to get the raw text 
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil { 
-		return 0, sadness("%s", err)
+		return 0, newError(err)
 	}
 
 	// Pattern of the value to locate from the response.Body bytes 
 	var pattern map[string]float64
 	err = c.deserializeJson(bytes, &pattern)
 	if err != nil { 
-		return 0, sadness("%s", err)
+		return 0, newError(err)
 	}
 
 	return uint64(pattern["result"]), nil

@@ -4,51 +4,49 @@ import (
 	"errors"
 )
 
-// Represents an enumeration of expiration values
-// GetExpiresInString(expiresIn ExpiresIn)(string)
-// will return the string format of expiration
-// All possible expiration values
+// ExpiresIn represents all the possible time formats
+// for when a paste will expire.
 type ExpiresIn int
 const (
-	Never ExpiresIn = iota
-	OneHour
-	TwoHours
-	TenHours
-	OneDay
-	TwoDays
-	OneWeek
-	OneMonth
-	OneYear
+	Never ExpiresIn = iota // string form -> "never"
+	OneHour  // string form -> "1h"
+	TwoHours // string form -> "2h"
+	TenHours // string form -> "10h"
+	OneDay   // string form -> "1d"
+	TwoDays  // string form -> "2d"
+	OneWeek  // string form -> "1w"
+	OneMonth // string form -> "1m"
+	OneYear  // string form -> "1y"
 )
 
 // Represents a single paste, containing all edits and pasties attached
 type Paste struct {
 	// Paste Id
-	Id          string    `json:"_id"`
+	Id          string   `json:"_id"`
 	// Owner of the paste, if none then will be " "
-	OwnerId     string    `json:"ownerId"`
+	OwnerId     string   `json:"ownerId"`
 	// Title of the paste
-	Title       string    `json:"title"`
+	Title       string   `json:"title"`
 	// Date in unix time when the paste was created
-	CreatedAt   uint64    `json:"createdAt"`
+	CreatedAt   uint64   `json:"createdAt"`
 	// When the paste expires
-	ExpiresIn   string    `json:"expiresIn"`
+	ExpiresIn   string   `json:"expiresIn"`
 	// Date in unix time when the paste will be deleted
-	DeletesAt   uint64    `json:"deletesAt"`
+	DeletesAt   uint64   `json:"deletesAt"`
 	// Amount of stars the paste has
-	Stars       uint64    `json:"stars"`
+	Stars       uint64   `json:"stars"`
 	// Is the paste private?
-	IsPrivate   bool      `json:"isPrivate"`
+	IsPrivate   bool     `json:"isPrivate"`
 	// Is the paste public?
-	IsPublic    bool      `json:"isPublic"`
+	IsPublic    bool     `json:"isPublic"`
 	// Is the paste encrypted?
-	IsEncrypted bool      `json:"encrypted"`
+	IsEncrypted bool     `json:"encrypted"`
 	// Slices of all tags for this paste
-	Tags        []string  `json:"tags"`
+	Tags        []string `json:"tags"`
 	// Slice of all the pasties on the paste
-	Pasties     []Pasty   `json:"pasties"`
+	Pasties     []Pasty  `json:"pasties"`
 	// Slice of all edits
-	Edits       []Edit    `json:"edits"`
+	Edits       []Edit   `json:"edits"`
 }
 // Represents a single pasty, could also be perceived as a "file" 
 // on the PasteMyst website, contains language, code, and title.
@@ -119,7 +117,7 @@ func (c *Client) GetPaste(id string) (*Paste, error) {
 	var paste Paste
 	err := client.get(url, &paste)
 	if err != nil {
-		return nil, sadness("%v", err)
+		return nil, newError(err)
 	}
 
 	return &paste, nil
@@ -146,7 +144,7 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) {
 	var paste Paste
 	err := client.post(url, createInfo, &paste)
 	if err != nil { 
-		return nil, sadness("%v", err)
+		return nil, newError(err)
 	}
 	
 	return &paste, nil
@@ -169,7 +167,7 @@ func (c *Client) DeletePaste(id string) error {
 	ok, err := client.delete(url, &Paste{})
 
 	if !ok || err != nil {
-		return sadness("Unable to delete paste\n%v", err)
+		return newErrorf("Unable to delete paste\n%v", err)
 	}
 
 	return nil
@@ -193,7 +191,7 @@ func (c *Client) EditPaste(paste Paste) (*Paste, error) {
 
 	err := client.patch(url, &paste)
 	if err != nil {
-		return nil, sadness("%v", err)
+		return nil, newError(err)
 	}
 
 	return &paste, nil

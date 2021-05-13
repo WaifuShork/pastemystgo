@@ -13,7 +13,7 @@ import (
 //
 // Returns:
 //  (error)
-func (c *Client) deserializeJson(bytes []byte, v interface{}) (error) {
+func (c *Client) deserializeJson(bytes []byte, v interface{}) error {
 	return json.Unmarshal(bytes, &v)
 }
 
@@ -38,16 +38,16 @@ func (c *Client) serializeJson(v interface{}, isIndented bool) ([]byte, error) {
 //
 // Returns:
 //  (error)
-func (c *Client) bodyToJson(response *http.Response, pattern interface{}) (error) { 
+func (c *Client) bodyToJson(response *http.Response, pattern interface{}) error { 
 	// Read the responses body to get the raw text
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return sadness("Error reading Response Body\n%v", err)
+		return newErrorf("Error reading Response Body\n%v", err)
 	}
 
 	err = c.deserializeJson(bytes, &pattern)
 	if err != nil {
-		return sadness("Error Deserializing the Response Body\n%v", err)
+		return newErrorf("Error Deserializing the Response Body\n%v", err)
 	}
 	return nil
 }
@@ -60,11 +60,11 @@ func (c *Client) bodyToJson(response *http.Response, pattern interface{}) (error
 // 
 // Returns:
 //  (error)
-func (c *Client) postBodyToJson(client http.Client, request *http.Request, pattern interface{}) (error) { 
+func (c *Client) postBodyToJson(client http.Client, request *http.Request, pattern interface{}) error { 
 	// Post the actual request
 	response, err := client.Do(request)
 	if err != nil { 
-		return sadness("Unable to DO request.\n%v", err)
+		return newErrorf("Unable to DO request.\n%v", err)
 	}
 
 	defer response.Body.Close()
@@ -76,6 +76,16 @@ func (c *Client) postBodyToJson(client http.Client, request *http.Request, patte
 //
 // Returns:
 //  (error)
-func sadness(message string, err ...interface{}) error {
+func newErrorf(message string, err ...interface{}) error {
 	return errors.New(fmt.Sprintln(message, err))
+}
+
+// Wraps newErrorf for simplicity. Instead of being forced to string
+// format on every call, you can simply pass the error message.  
+// Properly prints the value of the error with default formatting as well.  
+//
+// Returns:
+//  (error)
+func newError(err error) error {
+	return newErrorf("%v", err)
 }
