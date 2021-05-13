@@ -4,18 +4,7 @@ import (
 	"net/url"
 )
 
-const (
-	BaseEndpoint  string =  `https://paste.myst.rs/api/v2/`
-	DataEndpoint  string =  BaseEndpoint + `data/`
-	TimeEndpoint  string =  BaseEndpoint + `time/`
-	UserEndpoint  string =  BaseEndpoint + `user/`
-	PasteEndpoint string =  BaseEndpoint + `paste/`
 
-	DataLanguageByName string = DataEndpoint + `language?name=`
-	DataLanguageByExt  string = DataEndpoint + `languageExt?extension=`
-	
-	TimeExpiresInToUnix string = TimeEndpoint + `expiresInToUnixTime`
-)
 
 // Gets a language based on its pretty name:
 //

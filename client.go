@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-
 type RequestMethod int 
 const (
 	GET RequestMethod = iota

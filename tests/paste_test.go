@@ -52,7 +52,7 @@ func TestCreatePaste(t *testing.T) {
 	
 	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "pastemystgotest",
-		ExpiresIn: "1d",
+		ExpiresIn: "1h",
 		IsPrivate: false,
 		IsPublic:  false,
 		Tags:      "",
@@ -77,7 +77,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 	
 	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "api test paste",
-		ExpiresIn: "1d",
+		ExpiresIn: "1h",
 		IsPrivate: true,
 		IsPublic:  false,
 		Tags:      "",
@@ -106,7 +106,7 @@ func TestDeletePaste(t *testing.T) {
 	
 	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "api test paste",
-		ExpiresIn: "1d",
+		ExpiresIn: "1h",
 		IsPrivate: false,
 		IsPublic:  false,
 		Tags:      "",
@@ -131,7 +131,7 @@ func TestEditPaste(t *testing.T) {
 	
 	createInfo := pastemystgo.PasteCreateInfo{
 		Title:     "api test paste",
-		ExpiresIn: "1d",
+		ExpiresIn: "1h",
 		IsPrivate: false,
 		IsPublic:  false,
 		Tags:      "",
