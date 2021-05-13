@@ -11,8 +11,8 @@ import (
 //
 // Returns:
 //  (uint64, error)
-func ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint64, error) {
-	expiresIn := GetExpiresInString(expires)
+func (c *Client) ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint64, error) {
+	expiresIn := c.getExpiresInString(expires)
 	url := TimeExpiresInToUnix + fmt.Sprintf("?createdAt=%d&expiresIn=%s", createdAt, expiresIn)
 
 	response, err := http.Get(url)
@@ -28,7 +28,7 @@ func ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint64, error) {
 
 	// Pattern of the value to locate from the response.Body bytes 
 	var pattern map[string]float64
-	err = DeserializeJson(bytes, &pattern)
+	err = c.deserializeJson(bytes, &pattern)
 	if err != nil { 
 		return 0, sadness("%s", err)
 	}
@@ -42,7 +42,7 @@ func ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint64, error) {
 //
 // Returns:
 //  (string)
-func GetExpiresInString(expiresIn ExpiresIn) string { 
+func (c *Client) getExpiresInString(expiresIn ExpiresIn) string { 
 	switch expiresIn {
 	case Never:
 		return "never"

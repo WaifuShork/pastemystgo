@@ -2,12 +2,10 @@ package tests
 
 import (
 	"testing"
-
-	"github.com/WaifuShork/pastemystgo"
 )
 
 func TestUserExists(t *testing.T) {
-	user, _ := pastemystgo.UserExists("codemyst")
+	user, _ := client.UserExists("codemyst")
 	if !user { 
 		t.Errorf("Problem locating user.")
 	}
@@ -20,7 +18,7 @@ func TestGetUser(t *testing.T) {
 	} 
 
 	for _, tt := range tests { 
-		user, _ := pastemystgo.GetUser(tt)
+		user, _ := client.GetUser(tt)
 		if !user.PublicProfile { 
 			t.Errorf("Could not properly get user %s, please ensure their profile is public.", tt)
 		}

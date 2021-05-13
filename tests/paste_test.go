@@ -1,10 +1,9 @@
 package tests
 
 import (
-	"os"
 	"testing"
 
-	"github.com/WaifuShork/pastemystgo"
+	"github.com/waifushork/pastemystgo"
 )
 
 // For new pastes ensure that the max paste lifetime is 1m for courtesy of paste space.
@@ -28,7 +27,7 @@ func TestGetPaste(t *testing.T) {
 	}
 
 	for _, tt := range tests { 
-		paste, err := pastemystgo.GetPaste(tt.id, tt.token)
+		paste, err := client.GetPaste(tt.id)
 		if err != nil { 
 			t.Error(err)
 		}
@@ -60,7 +59,7 @@ func TestCreatePaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 
-	paste, _ := pastemystgo.CreatePaste(createInfo, "")
+	paste, _ := client.CreatePaste(createInfo)
 
 	if paste.Title != createInfo.Title { 
 		t.Errorf("Could not create paste\n%+v\nTitle %s", paste, paste.Title)
@@ -68,7 +67,6 @@ func TestCreatePaste(t *testing.T) {
 }
 
 func TestCreatePrivatePaste(t *testing.T) { 
-	token := os.Getenv("TOKEN")
 	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -86,7 +84,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 	
-	paste, _ := pastemystgo.CreatePaste(createInfo, token)
+	paste, _ := client.CreatePaste(createInfo)
 
 	if paste.Title != createInfo.Title {
 		t.Errorf("Could not create paste\n%+v\nTitle %s", paste, paste.Title)
@@ -98,7 +96,6 @@ func TestCreatePrivatePaste(t *testing.T) {
 }
 
 func TestDeletePaste(t *testing.T) { 
-	token := os.Getenv("TOKEN")
 	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -116,15 +113,14 @@ func TestDeletePaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 	
-	paste, _ := pastemystgo.CreatePaste(createInfo, token)
-	err := pastemystgo.DeletePaste(paste.Id, token)
+	paste, _ := client.CreatePaste(createInfo)
+	err := client.DeletePaste(paste.Id)
 	if err != nil { 
 		t.Errorf("Paste was not deleted.\nPaste Id=%v\nError=\n%v", paste.Id, err)
 	}
 }
 
 func TestEditPaste(t *testing.T) { 
-	token := os.Getenv("TOKEN")
 	pastyCreateInfo := []pastemystgo.PastyCreateInfo{
 		{
 			Title: "pasty1",
@@ -142,10 +138,10 @@ func TestEditPaste(t *testing.T) {
 		Pasties: pastyCreateInfo,
 	}
 
-	paste, _ := pastemystgo.CreatePaste(createInfo, token)
+	paste, _ := client.CreatePaste(createInfo)
 	paste.Title = "edited title"
 
-	newPaste, _ := pastemystgo.EditPaste(*paste, token)
+	newPaste, _ := client.EditPaste(*paste)
 	if newPaste.Title != "edited title" {
 		t.Errorf("Paste was not edited")
 	}

@@ -1,10 +1,12 @@
 package tests
 
 import (
+	"os"
 	"testing"
 
-	"github.com/WaifuShork/pastemystgo"
+	"github.com/waifushork/pastemystgo"
 )
+var client = pastemystgo.NewClient(os.Getenv("TOKEN"))
 
 func TestGetLanguage(t *testing.T) {
 	tests := []string { 
@@ -24,7 +26,7 @@ func TestGetLanguage(t *testing.T) {
 	}
 
 	for _, tt := range tests { 
-		language, err := pastemystgo.GetLanguageByName(pastemystgo.DataLanguageByName, tt)
+		language, err := client.GetLanguageByName(pastemystgo.DataLanguageByName, tt)
 		if err != nil {
 			t.Errorf("Something went wrong\nError:%v\n%s", err, tt)
 		}
@@ -47,7 +49,7 @@ func TestGetLanguageByExtension(t *testing.T) {
 	}
 	
 	for _, tt := range tests {
-		language, err := pastemystgo.GetLanguageByExtension(tt)
+		language, err := client.GetLanguageByExtension(tt)
 		if err != nil {
 			t.Errorf("An error occurred.\n%v", err)
 		}

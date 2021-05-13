@@ -3,7 +3,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/WaifuShork/pastemystgo"
+	"github.com/waifushork/pastemystgo"
 )
 
 func TestTimeExpiresInProperly(t *testing.T) { 
@@ -35,7 +35,7 @@ func TestTimeExpiresInProperly(t *testing.T) {
 	}
 
 	for _, tt := range tests { 
-		value, _ := pastemystgo.ExpiresInToUnixTime(tt.createdAt, tt.expiresIn)
+		value, _ := client.ExpiresInToUnixTime(tt.createdAt, tt.expiresIn)
 		if value != tt.expected { 
 			t.Errorf("Time format incorrect %d", value)
 		}

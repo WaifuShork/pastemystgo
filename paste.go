@@ -112,12 +112,12 @@ type PasteCreateInfo struct {
 //  
 // Returns:
 //  (*Paste, error)
-func GetPaste(id string, token string) (*Paste, error) {
+func (c *Client) GetPaste(id string) (*Paste, error) {
 	url := PasteEndpoint + id
-	client := &Client{Token: token}
+	client := NewClient(c.Token) 
 
 	var paste Paste
-	err := client.Get(url, &paste)
+	err := client.get(url, &paste)
 	if err != nil {
 		return nil, sadness("%v", err)
 	}
@@ -131,20 +131,20 @@ func GetPaste(id string, token string) (*Paste, error) {
 //  
 // Returns:
 //  (*Paste, error)
-func CreatePaste(createInfo PasteCreateInfo, token string) (*Paste, error) { 	
+func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) { 	
 	// There's no sense bothering with anything else if these checks fail
 	// IsPrivate, IsPublic, and Tags are related to account features, if no token is passed
 	// then these flags aren't allowed to be true. 
-	if (createInfo.IsPrivate || createInfo.IsPublic || createInfo.Tags != "") && token == "" {
+	if (createInfo.IsPrivate || createInfo.IsPublic || createInfo.Tags != "") && c.Token == "" {
 		return nil, errors.New("Error: Cannot use account features without a valid token.")
 	}
 
 	// url for where the paste will go
 	url := BaseEndpoint + "paste/"
-	client := &Client{Token: token} 
+	client := NewClient(c.Token) 
 
 	var paste Paste
-	err := client.Post(url, createInfo, &paste)
+	err := client.post(url, createInfo, &paste)
 	if err != nil { 
 		return nil, sadness("%v", err)
 	}
@@ -162,11 +162,11 @@ func CreatePaste(createInfo PasteCreateInfo, token string) (*Paste, error) {
 //  
 // Returns:
 //  (error)
-func DeletePaste(id, token string) error { 
+func (c *Client) DeletePaste(id string) error { 
 	url := PasteEndpoint + id
 	
-	client := &Client{Token: token}
-	ok, err := client.Delete(url, &Paste{})
+	client := NewClient(c.Token) 
+	ok, err := client.delete(url, &Paste{})
 
 	if !ok || err != nil {
 		return sadness("Unable to delete paste\n%v", err)
@@ -186,12 +186,12 @@ func DeletePaste(id, token string) error {
 //  
 // Returns:
 //  (*Paste, error)
-func EditPaste(paste Paste, token string) (*Paste, error) { 
+func (c *Client) EditPaste(paste Paste) (*Paste, error) { 
 	// url for where the paste will go
 	url := PasteEndpoint + paste.Id
-	client := &Client{Token: token}
+	client := NewClient(c.Token) 
 
-	err := client.Patch(url, &paste)
+	err := client.patch(url, &paste)
 	if err != nil {
 		return nil, sadness("%v", err)
 	}

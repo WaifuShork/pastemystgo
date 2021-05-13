@@ -30,8 +30,17 @@ func NewClient(token string) *Client {
 	}
 }
 
-func (c *Client) Get(url string, pattern interface{}) (error) { 
-	response, err := c.MakeRequest(url, GET, nil, &pattern)
+// Marks a Client for deletion by assigning it to nil,
+// allowing it to be handled by the Garbage Collector.
+//
+// Remarks: This function should be called when you're done 
+// using the client, ensure that cleanup is executed.
+func (c *Client) DeleteClient() { 
+	c = nil
+}
+
+func (c *Client) get(url string, pattern interface{}) (error) { 
+	response, err := c.makeRequest(url, GET, nil, &pattern)
 	if err != nil { 
 		sadness("%v", err)
 	}
@@ -43,8 +52,8 @@ func (c *Client) Get(url string, pattern interface{}) (error) {
 	return nil	
 }
 
-func (c *Client) Post(url string, body interface{}, pattern interface{}) error { 
-	response, err := c.MakeRequest(url, POST, body, &pattern)
+func (c *Client) post(url string, body interface{}, pattern interface{}) error { 
+	response, err := c.makeRequest(url, POST, body, &pattern)
 	if err != nil { 
 		return sadness("%v", err)
 	}
@@ -56,8 +65,8 @@ func (c *Client) Post(url string, body interface{}, pattern interface{}) error {
 	return nil
 }
 
-func (c *Client) Patch(url string, body interface{}) error {
-	response, err := c.MakeRequest(url, PATCH, body, nil)
+func (c *Client) patch(url string, body interface{}) error {
+	response, err := c.makeRequest(url, PATCH, body, nil)
 	if err != nil { 
 		return sadness("%v", err)
 	}
@@ -69,8 +78,8 @@ func (c *Client) Patch(url string, body interface{}) error {
 	return nil
 }
 
-func (c *Client) Delete(url string, pattern interface{}) (bool, error) { 
-	response, err := c.MakeRequest(url, DELETE, nil, nil)
+func (c *Client) delete(url string, pattern interface{}) (bool, error) { 
+	response, err := c.makeRequest(url, DELETE, nil, nil)
 	if err != nil {
 		return false, sadness("%v", err)
 	}
@@ -78,7 +87,7 @@ func (c *Client) Delete(url string, pattern interface{}) (bool, error) {
 	return response.StatusCode == http.StatusOK, nil
 }
 
-func (c *Client) MakeRequest(url string, method RequestMethod, body interface{}, outPattern interface{}) (*http.Response, error) { 
+func (c *Client) makeRequest(url string, method RequestMethod, body interface{}, outPattern interface{}) (*http.Response, error) { 
 	reqMethod := c.getRequestMethod(method)
 	// endpointUrl := BaseEndpoint + url
 
@@ -103,7 +112,7 @@ func (c *Client) MakeRequest(url string, method RequestMethod, body interface{},
 	}
 
 	if body != nil || outPattern != nil { 
-		err = BodyToJson(response, &outPattern)
+		err = c.bodyToJson(response, &outPattern)
 		if err != nil {
 			return nil, sadness("%v", err)
 		}

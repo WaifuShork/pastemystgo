@@ -13,7 +13,7 @@ import (
 //
 // Returns:
 //  (error)
-func DeserializeJson(bytes []byte, v interface{}) (error) {
+func (c *Client) deserializeJson(bytes []byte, v interface{}) (error) {
 	return json.Unmarshal(bytes, &v)
 }
 
@@ -22,7 +22,7 @@ func DeserializeJson(bytes []byte, v interface{}) (error) {
 //
 // Returns:
 //  ([]byte, error)
-func SerializeJson(v interface{}, isIndented bool) ([]byte, error) {
+func (c *Client) serializeJson(v interface{}, isIndented bool) ([]byte, error) {
 	if isIndented {
 		return json.MarshalIndent(&v, "", "    ")
 	} else { 
@@ -38,14 +38,14 @@ func SerializeJson(v interface{}, isIndented bool) ([]byte, error) {
 //
 // Returns:
 //  (error)
-func BodyToJson(response *http.Response, pattern interface{}) (error) { 
+func (c *Client) bodyToJson(response *http.Response, pattern interface{}) (error) { 
 	// Read the responses body to get the raw text
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return sadness("Error reading Response Body\n%v", err)
 	}
 
-	err = DeserializeJson(bytes, &pattern)
+	err = c.deserializeJson(bytes, &pattern)
 	if err != nil {
 		return sadness("Error Deserializing the Response Body\n%v", err)
 	}
@@ -60,7 +60,7 @@ func BodyToJson(response *http.Response, pattern interface{}) (error) {
 // 
 // Returns:
 //  (error)
-func PostBodyToJson(client http.Client, request *http.Request, pattern interface{}) (error) { 
+func (c *Client) postBodyToJson(client http.Client, request *http.Request, pattern interface{}) (error) { 
 	// Post the actual request
 	response, err := client.Do(request)
 	if err != nil { 
@@ -68,7 +68,7 @@ func PostBodyToJson(client http.Client, request *http.Request, pattern interface
 	}
 
 	defer response.Body.Close()
-	return BodyToJson(response, pattern)
+	return c.bodyToJson(response, pattern)
 }
 
 // Wraps errors.New(error) so you can easily throw a new error without 

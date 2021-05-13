@@ -27,7 +27,7 @@ type User struct {
 //  
 // Returns:
 //  (bool, error)
-func UserExists(username string) (bool, error) {
+func (c *Client) UserExists(username string) (bool, error) {
 	url := UserEndpoint + url.QueryEscape(username) + "/exists"
 
 	request, err := http.Get(url)
@@ -44,11 +44,11 @@ func UserExists(username string) (bool, error) {
 //  
 // Returns:
 //  (*User, error)
-func GetUser(username string) (*User, error) {
+func (c *Client) GetUser(username string) (*User, error) {
 	var user User
 	url := UserEndpoint + url.QueryEscape(username)
 	client := &Client{}
-	err := client.Get(url, &user)
+	err := client.get(url, &user)
 	if err != nil { 
 		return nil, sadness("%v", err)
 	}

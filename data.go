@@ -27,18 +27,18 @@ const (
 // Returns:
 //  (*Language, error)
 // BUG(r): Some languages will not return properly, and will error out.
-func GetLanguageByName(endpoint, value string) (*Language, error) {
+func (c *Client) GetLanguageByName(endpoint, value string) (*Language, error) {
 	// Request the language from the API endpoint
 	url := endpoint + url.QueryEscape(value)
 	client := &Client{}
 
 	var language Language
 	
-	err := client.Get(url, &language)
+	err := client.get(url, &language)
 	if err != nil {
 		return nil, sadness("%v", err)
 	}
-
+	
 	return &language, nil
 }
 
@@ -47,10 +47,10 @@ func GetLanguageByName(endpoint, value string) (*Language, error) {
 // Returns:
 //  (*Language, error)
 // BUG(r): Some languages will not return properly, and will error out.
-func GetLanguageByExtension(extension string) (*Language, error) { 
+func (c *Client) GetLanguageByExtension(extension string) (*Language, error) { 
 	var language Language
 	client := &Client{}
-	err := client.Get(DataLanguageByExt + extension, &language)
+	err := client.get(DataLanguageByExt + extension, &language)
 	if err != nil { 
 		return nil, sadness("%v", err)
 	}
