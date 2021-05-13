@@ -13,7 +13,7 @@ The PasteMystGo API wrapper consists of four main modules, data, time, user, and
 When you initially create a pastemyst session, you'll have the option to provide a "token", the following features are available to use without a token: 
 * Creating a public paste
 * Getting a public paste
-* Getting when a paste paste expires 
+* Getting when a paste expires 
 
 The following features are unavailable to use without a token:
 * Creating a private paste

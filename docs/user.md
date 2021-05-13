@@ -21,6 +21,9 @@ type User struct {
 
 Ensure user exists:
 ```go
+func (c *Client) UserExists(username string) (bool, error)
+```
+```go
 ok, err := client.UserExists("waifushork")
 if err != nil || !ok { 
     panic(err)
@@ -28,6 +31,9 @@ if err != nil || !ok {
 ```
 
 Get user with a username:
+```go
+func (c *Client) GetUser(username string) (*User, error)
+```
 ```go
 user, err := client.GetUser("waifushork")
 if err != nil {

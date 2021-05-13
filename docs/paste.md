@@ -27,6 +27,9 @@ type Paste struct {
 
 Getting a paste using an Id:
 ```go
+func (c *Client) GetPaste(id string) (*Paste, error)
+```
+```go
 paste, err := client.GetPaste("sewevxee")
 if err != nil {
     panic(err)
@@ -35,7 +38,9 @@ if err != nil {
 
 Creating a paste from scratch:
 ```go
-// Creating a paste
+func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error)
+```
+```go
 pastyCreateInfo := []pastemystgo.PastyCreateInfo{
     {
         Title: "pasty1",
@@ -53,7 +58,6 @@ createInfo := pastemystgo.PasteCreateInfo{
     Pasties: pastyCreateInfo,
 }
 
-// No token needs to be passed for a public paste
 paste, err := client.CreatePaste(createInfo)
 if err != nil { 
     panic(err)
@@ -61,6 +65,9 @@ if err != nil {
 ```
 
 Deleting a paste:
+```go
+func (c *Client) DeletePaste(id string) (error)
+```
 ```go
 paste, err := client.GetPaste("sewevxee")
 if err != nil { 
@@ -75,6 +82,9 @@ if err != nil {
 
 Editing a paste:
 ```go
+func (c *Client) EditPaste(paste Paste) (*Paste, error)
+```
+```go
 paste, err := client.GetPaste("sewevxee")
 if err != nil { 
     panic(err)
@@ -86,5 +96,4 @@ editedPaste, err := client.EditPaste(*paste)
 if err != nil {
     panic(err)
 }
-
 ```

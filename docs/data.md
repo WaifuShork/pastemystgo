@@ -19,6 +19,9 @@ type Language struct {
 
 Getting a language by its name.
 ```go
+func (c *Client) GetLanguageByName(endpoint, value string) (*Language, error)
+```
+```go
 language, err := client.GetLanguageByName("Go")
 if err != nil {
     panic(err)
@@ -26,6 +29,9 @@ if err != nil {
 ```
 
 Getting a language by its extension.
+```go
+func (c *Client) GetLanguageByExtension(extension string) (*Language, error)
+```
 ```go
 language, err := client.GetLanguageByExtension("go")
 if err != nil { 
