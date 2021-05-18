@@ -7,6 +7,9 @@ const (
 	TimeEndpoint  string = BaseEndpoint + `time/`
 	UserEndpoint  string = BaseEndpoint + `user/`
 	PasteEndpoint string = BaseEndpoint + `paste/`
+	
+	SelfUserEndpoint string = BaseEndpoint + "user/self/"
+	SelfUserPastesEndpoint string = SelfUserEndpoint + "pastes"
 
 	DataLanguageByName string = DataEndpoint + `language?name=`
 	DataLanguageByExt  string = DataEndpoint + `languageExt?extension=`

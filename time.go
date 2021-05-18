@@ -42,7 +42,7 @@ func (c *Client) ExpiresInToUnixTime(createdAt uint64, expires ExpiresIn) (uint6
 //
 // Returns:
 //  (string)
-func (c *Client) getExpiresInString(expiresIn ExpiresIn) string { 
+func (c *Client) getExpiresInString(expiresIn ExpiresIn) string {
 	switch expiresIn {
 	case Never:
 		return "never"

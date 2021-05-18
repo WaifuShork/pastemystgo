@@ -38,16 +38,16 @@ func (c *Client) serializeJson(v interface{}, isIndented bool) ([]byte, error) {
 //
 // Returns:
 //  (error)
-func (c *Client) bodyToJson(response *http.Response, pattern interface{}) error { 
+func (c *Client) bodyToJson(response *http.Response, pattern interface{}) error {
 	// Read the responses body to get the raw text
 	bytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return newErrorf("Error reading Response Body\n%v", err)
+		return newErrorf("error reading response body\n%v", err)
 	}
 
 	err = c.deserializeJson(bytes, &pattern)
 	if err != nil {
-		return newErrorf("Error Deserializing the Response Body\n%v", err)
+		return newErrorf("error deserializing the Response Body\n%v", err)
 	}
 	return nil
 }
@@ -60,11 +60,11 @@ func (c *Client) bodyToJson(response *http.Response, pattern interface{}) error 
 // 
 // Returns:
 //  (error)
-func (c *Client) postBodyToJson(client http.Client, request *http.Request, pattern interface{}) error { 
+func (c *Client) postBodyToJson(client http.Client, request *http.Request, pattern interface{}) error {
 	// Post the actual request
 	response, err := client.Do(request)
 	if err != nil { 
-		return newErrorf("Unable to DO request.\n%v", err)
+		return newErrorf("unable to do request.\n%v", err)
 	}
 
 	defer response.Body.Close()

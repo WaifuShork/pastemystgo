@@ -1,9 +1,5 @@
 package pastemystgo
 
-import (
-	"errors"
-)
-
 // ExpiresIn represents all the possible time formats
 // for when a paste will expire.
 type ExpiresIn int
@@ -19,7 +15,7 @@ const (
 	OneYear  // string form -> "1y"
 )
 
-// Represents a single paste, containing all edits and pasties attached
+// Paste represents a single paste, containing all edits and pasties attached
 type Paste struct {
 	// Paste Id
 	Id          string   `json:"_id"`
@@ -48,7 +44,7 @@ type Paste struct {
 	// Slice of all edits
 	Edits       []Edit   `json:"edits"`
 }
-// Represents a single pasty, could also be perceived as a "file" 
+// Pasty represents a single pasty, could also be perceived as a "file"
 // on the PasteMyst website, contains language, code, and title.
 type Pasty struct {
 	// Id of the pasty
@@ -61,7 +57,7 @@ type Pasty struct {
 	Code     string `json:"code"`
 }
 
-// Holds information about a given edit based in 'id'
+// Edit holds information about a given edit based in 'id'
 type Edit struct {
 	// Unique id of the edit
 	Id       string   `json:"_id"`
@@ -79,43 +75,43 @@ type Edit struct {
 	EditedAt uint64   `json:"editedAt"`
 }
 
-// Information needed to created a new pasty
+// PastyCreateInfo represents the information needed to created a new pasty
 type PastyCreateInfo struct { 
-	// Title of pasty
+	// Title represents the title of a pasty
 	Title    string `json:"title"`
-	// Language of the pasty, stores the name of the language,
-	// not the mode or MIME type.
+	// Language represents the language of the pasty,
+	// stores the name of the language, not the mode or MIME type.
 	Language string `json:"language"`
-	// Code of the pasty
+	// Code represents the code of the pasty
 	Code     string `json:"code"`
 }
 
-// Information needed to create a new paste
+// PasteCreateInfo represents the information needed to create a new paste
 type PasteCreateInfo struct { 
-	// Title -- optional
+	// Title represents the title of the paste -- optional
 	Title     string            `json:"title"`
-	// ExpiresIn -- optional
+	// ExpiresIn represents when the paste will expire -- optional
 	ExpiresIn string            `json:"expiresIn"`
-	// Is it accessible by the owner? -- optional
+	// IsPrivate represents if it is accessible by the owner -- optional
 	IsPrivate bool              `json:"isPrivate"`
-	// Is it displayed on the owners public profile? -- optional
+	// IsPublic represents if it is displayed on the owners public profile -- optional
 	IsPublic  bool              `json:"isPublic"`
-	// Tags, comma separated -- optional
+	// Tags represents comma separated paste tags -- optional
 	Tags      string            `json:"tags"`
-	// List of pasties -- mandatory
+	// Pasties represents a slice of pasties -- mandatory
 	Pasties   []PastyCreateInfo `json:"pasties"`
 }
 
-// Gets a paste based on Id, a token is mandatory for accessing private pastes
+// GetPaste gets a paste based on Id, a token is mandatory for accessing private pastes
 //  
 // Returns:
 //  (*Paste, error)
 func (c *Client) GetPaste(id string) (*Paste, error) {
 	url := PasteEndpoint + id
-	client := NewClient(c.Token) 
+	// client := NewClient(c.Token)
 
 	var paste Paste
-	err := client.get(url, &paste)
+	err := c.get(url, &paste)
 	if err != nil {
 		return nil, newError(err)
 	}
@@ -123,26 +119,26 @@ func (c *Client) GetPaste(id string) (*Paste, error) {
 	return &paste, nil
 }
 
-// Creates a new paste with the given PasteCreateInfo
+// CreatePaste creates a new paste with the given PasteCreateInfo
 // 
 // Posts new pastes to (https://paste.myst.rs/api/v2/paste)
 //  
 // Returns:
 //  (*Paste, error)
-func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) { 	
+func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) {
 	// There's no sense bothering with anything else if these checks fail
 	// IsPrivate, IsPublic, and Tags are related to account features, if no token is passed
 	// then these flags aren't allowed to be true. 
 	if (createInfo.IsPrivate || createInfo.IsPublic || createInfo.Tags != "") && c.Token == "" {
-		return nil, errors.New("Error: Cannot use account features without a valid token.")
+		return nil, newErrorf("error: cannot use account features without a valid token")
 	}
 
 	// url for where the paste will go
 	url := BaseEndpoint + "paste/"
-	client := NewClient(c.Token) 
+	// c := NewClient(c.Token)
 
 	var paste Paste
-	err := client.post(url, createInfo, &paste)
+	err := c.post(url, createInfo, &paste)
 	if err != nil { 
 		return nil, newError(err)
 	}
@@ -150,7 +146,7 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) {
 	return &paste, nil
 }
 
-// Deletes a paste with a specified account token -- mandatory
+// DeletePaste deletes a paste with a specified account token -- mandatory
 //
 // You can only delete pastes on the account of the token that has been passed.
 // 
@@ -160,20 +156,20 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) {
 //  
 // Returns:
 //  (error)
-func (c *Client) DeletePaste(id string) error { 
+func (c *Client) DeletePaste(id string) error {
 	url := PasteEndpoint + id
 	
-	client := NewClient(c.Token) 
-	ok, err := client.delete(url, &Paste{})
+	// c := NewClient(c.Token)
+	ok, err := c.delete(url, &Paste{})
 
 	if !ok || err != nil {
-		return newErrorf("Unable to delete paste\n%v", err)
+		return newErrorf("error: unable to delete paste:\n%v", err)
 	}
 
 	return nil
 }
 
-// Edits a paste with a specified account token -- mandatory
+// EditPaste edits a paste with a specified account token -- mandatory
 //
 // You can only edit pastes on the account of the token that has been passed.
 // 
@@ -184,12 +180,12 @@ func (c *Client) DeletePaste(id string) error {
 //  
 // Returns:
 //  (*Paste, error)
-func (c *Client) EditPaste(paste Paste) (*Paste, error) { 
+func (c *Client) EditPaste(paste Paste) (*Paste, error) {
 	// url for where the paste will go
 	url := PasteEndpoint + paste.Id
-	client := NewClient(c.Token) 
+	// c := NewClient(c.Token)
 
-	err := client.patch(url, &paste)
+	err := c.patch(url, &paste)
 	if err != nil {
 		return nil, newError(err)
 	}

@@ -13,15 +13,11 @@ func TestGetPaste(t *testing.T) {
 		token string
 	}{
 		{
-			id: "9dj6x301",
+			id: "i3dcx8ab",
 			token: "",
 		},
 		{
 			id: "cwy615yg",
-			token: "",
-		},
-		{
-			id: "98xqsist",
 			token: "",
 		},
 	}
@@ -37,7 +33,7 @@ func TestGetPaste(t *testing.T) {
 		}
 		if paste.Id != tt.id {
 			t.Errorf("Incorrect Paste Id. \nExpected: (%s)\nGot: (%s)", tt.id, paste.Id)
-		}	
+		}
 	}
 }
 
