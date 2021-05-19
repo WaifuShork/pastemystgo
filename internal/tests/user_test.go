@@ -2,6 +2,7 @@ package tests
 
 import (
 	"testing"
+	"time"
 )
 
 func TestUserExists(t *testing.T) {
@@ -9,6 +10,7 @@ func TestUserExists(t *testing.T) {
 	if !user { 
 		t.Errorf("Problem locating user.")
 	}
+	time.Sleep(time.Second)
 }
 
 func TestGetUser(t *testing.T) { 
@@ -23,6 +25,7 @@ func TestGetUser(t *testing.T) {
 			t.Errorf("Could not properly get user %s, please ensure their profile is public.", tt)
 		}
 	}
+	time.Sleep(time.Second)
 }
 
 func TestGetSelfUser(t *testing.T) {
@@ -31,6 +34,7 @@ func TestGetSelfUser(t *testing.T) {
 	if user.Username != "WaifuShork" {
 		t.Errorf("Username was not correct, want=%v. got=%v", "WaifuShork", user.Username)
 	}
+	time.Sleep(time.Second)
 }
 
 func TestGetSelfPastesByAmount(t *testing.T) {
@@ -42,6 +46,7 @@ func TestGetSelfPastesByAmount(t *testing.T) {
 	if len(pastes) != 5 {
 		t.Errorf("wrong paste count. want=%d. got=%d", 5, len(pastes))
 	}
+	time.Sleep(time.Second)
 }
 
 // Ensure you have at least 1 paste on your account, not sure how to test this otherwise.
@@ -51,6 +56,7 @@ func TestGetSelfPasteIds(t *testing.T) {
 	if pastes == nil || len(pastes) == 0 {
 		t.Errorf("paste(s) count was 0 or nil. %+v", pastes)
 	}
+	time.Sleep(time.Second)
 }
 
 func TestGetSelfPastes(t *testing.T) {
@@ -65,12 +71,5 @@ func TestGetSelfPastes(t *testing.T) {
 			t.Error("Paste Id was empty.")
 		}
 	}
-}
-
-func TestIsAuthorized(t *testing.T) {
-	isAuthorized := client.IsAuthorized()
-
-	if !isAuthorized {
-		t.Errorf("unable to access API token")
-	}
+	time.Sleep(time.Second)
 }
