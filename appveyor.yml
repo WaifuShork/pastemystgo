@@ -14,5 +14,5 @@ before_test:
 
 test_script:
   - go test ./internal/tests -race -coverprofile=coverage.out -covermode=atomic
+  - codecov -f "coverage.out" -t ${{ secrets.CODECOV_TOKEN }}
   - curl -s https://codecov.io/bash > codecov
-    
