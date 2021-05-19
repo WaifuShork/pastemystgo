@@ -25,3 +25,6 @@ jobs:
       env:
         TOKEN: ${{ secrets.TOKEN }}
       run: go test ./internal/tests -race -coverprofile=coverage.out -covermode=atomic
+      
+    - name: Upload
+      run: bash <(curl -s https://codecov.io/bash) 
