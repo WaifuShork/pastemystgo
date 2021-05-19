@@ -8,6 +8,7 @@ import (
 )
 var client = pastemystgo.NewClient(os.Getenv("TOKEN"))
 
+// Keep the list small due to rate-limiting
 func TestGetLanguage(t *testing.T) {
 	tests := []string { 
 		"Autodetect",
@@ -26,7 +27,7 @@ func TestGetLanguage(t *testing.T) {
 	}
 
 	for _, tt := range tests { 
-		language, err := client.GetLanguageByName(pastemystgo.DataLanguageByName, tt)
+		language, err := client.GetLanguageByName(tt)
 		if err != nil {
 			t.Errorf("Something went wrong\nError:%v\n%s", err, tt)
 		}
@@ -40,7 +41,6 @@ func TestGetLanguage(t *testing.T) {
 	}
 }
 
-// TODO: Solidify security of test. ()
 func TestGetLanguageByExtension(t *testing.T) { 
 	tests := []string { 
 		"c",

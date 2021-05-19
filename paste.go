@@ -15,7 +15,9 @@ const (
 	OneYear  // string form -> "1y"
 )
 
-// Paste represents a single paste, containing all edits and pasties attached
+// Paste represents a single paste, containing all edits and pasties attached.
+//
+// If you're accessing a private paste you need to provide the Authorization header.
 type Paste struct {
 	// Paste Id
 	Id          string   `json:"_id"`
@@ -57,14 +59,16 @@ type Pasty struct {
 	Code     string `json:"code"`
 }
 
-// Edit holds information about a given edit based in 'id'
+// Edit holds information about a given edit based in 'id'.
+//
+// You can only edit pastes on your account, so you must provide the Authorization header.
 type Edit struct {
 	// Unique id of the edit
 	Id       string   `json:"_id"`
 	// Edit id, multiple edits can share the same id
 	// to show that multiple properties were edited
 	// at the same time
-	EditId   string   `json:"editId"`
+	EditId   uint64   `json:"editId"`
 	// Type of edit (incomplete)
 	EditType uint64   `json:"editType"`
 	// Various metadata, most used case - storing which pasty was edited
@@ -103,47 +107,50 @@ type PasteCreateInfo struct {
 }
 
 // GetPaste gets a paste based on Id, a token is mandatory for accessing private pastes
-//  
+//
+// Params:
+// 	(pasteId string)
+//
 // Returns:
 //  (*Paste, error)
-func (c *Client) GetPaste(id string) (*Paste, error) {
-	url := PasteEndpoint + id
-	// client := NewClient(c.Token)
+func (c *Client) GetPaste(pasteId string) (paste *Paste, err error) {
+	url := EndpointPaste(pasteId)
 
-	var paste Paste
-	err := c.get(url, &paste)
+	err = c.get(url, &paste)
 	if err != nil {
-		return nil, newError(err)
+		return nil, err//newError(err)
 	}
 
-	return &paste, nil
+	return paste, nil
 }
 
 // CreatePaste creates a new paste with the given PasteCreateInfo
 // 
 // Posts new pastes to (https://paste.myst.rs/api/v2/paste)
-//  
+//
+// Params:
+// 	(createInfo PasteCreateInfo)
+//
 // Returns:
 //  (*Paste, error)
-func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) {
+func (c *Client) CreatePaste(createInfo PasteCreateInfo) (paste *Paste, err error) {
 	// There's no sense bothering with anything else if these checks fail
 	// IsPrivate, IsPublic, and Tags are related to account features, if no token is passed
 	// then these flags aren't allowed to be true. 
-	if (createInfo.IsPrivate || createInfo.IsPublic || createInfo.Tags != "") && c.Token == "" {
-		return nil, newErrorf("error: cannot use account features without a valid token")
+	if (createInfo.IsPrivate || createInfo.IsPublic || createInfo.Tags != "") && 
+	   (*c.Token == "" || c.Token == nil) {
+		return nil, err//newErrorf("error: cannot use account features without a valid token")
 	}
 
 	// url for where the paste will go
-	url := BaseEndpoint + "paste/"
-	// c := NewClient(c.Token)
+	url := EndpointBase + "paste/"
 
-	var paste Paste
-	err := c.post(url, createInfo, &paste)
+	err = c.post(url, createInfo, &paste)
 	if err != nil { 
-		return nil, newError(err)
+		return nil, err//newError(err)
 	}
 	
-	return &paste, nil
+	return paste, nil
 }
 
 // DeletePaste deletes a paste with a specified account token -- mandatory
@@ -153,17 +160,19 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error) {
 // A token is required for deleting a paste because this is an account feature.
 // 
 // This action is irreversible.
-//  
+//
+// Params:
+// 	(pasteId string)
+//
 // Returns:
 //  (error)
-func (c *Client) DeletePaste(id string) error {
-	url := PasteEndpoint + id
+func (c *Client) DeletePaste(pasteId string) error {
+	url := EndpointPaste(pasteId)
 	
-	// c := NewClient(c.Token)
-	ok, err := c.delete(url, &Paste{})
+	ok, err := c.delete(url)
 
 	if !ok || err != nil {
-		return newErrorf("error: unable to delete paste:\n%v", err)
+		return err//newErrorf("error: unable to delete paste:\n%v", err)
 	}
 
 	return nil
@@ -177,18 +186,20 @@ func (c *Client) DeletePaste(id string) error {
 // 
 // To edit values of a paste you must send back the exact same paste except with the 
 // adjusted values, you cannot edit expiration date, any result will have no effect.
-//  
+//
+// Params:
+// 	(paste *Paste)
+//
 // Returns:
 //  (*Paste, error)
-func (c *Client) EditPaste(paste Paste) (*Paste, error) {
+func (c *Client) EditPaste(paste *Paste) (*Paste, error) {
 	// url for where the paste will go
-	url := PasteEndpoint + paste.Id
-	// c := NewClient(c.Token)
+	url := EndpointPaste(paste.Id)
 
 	err := c.patch(url, &paste)
 	if err != nil {
-		return nil, newError(err)
+		return nil, err//newError(err)
 	}
 
-	return &paste, nil
+	return paste, nil
 }

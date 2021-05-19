@@ -1,18 +1,41 @@
 package pastemystgo
 
-// ALl the pastemyst API endpoints that can be accessed
+import (
+	"fmt"
+	"net/url"
+)
+
+// All the pastemyst API endpoints that can be accessed
 const (
-	BaseEndpoint  string = `https://paste.myst.rs/api/v2/`
-	DataEndpoint  string = BaseEndpoint + `data/`
-	TimeEndpoint  string = BaseEndpoint + `time/`
-	UserEndpoint  string = BaseEndpoint + `user/`
-	PasteEndpoint string = BaseEndpoint + `paste/`
-	
-	SelfUserEndpoint string = BaseEndpoint + "user/self/"
-	SelfUserPastesEndpoint string = SelfUserEndpoint + "pastes"
+	EndpointBase  = "https://paste.myst.rs/api/v2/"
+	EndpointData  = EndpointBase + "data/"  // Value: https://paste.myst.rs/api/v2/data/
+	EndpointTime  = EndpointBase + "time/"  // Value: https://paste.myst.rs/api/v2/time/
+	EndpointUser  = EndpointBase + "user/"  // Value: https://paste.myst.rs/api/v2/user/
 
-	DataLanguageByName string = DataEndpoint + `language?name=`
-	DataLanguageByExt  string = DataEndpoint + `languageExt?extension=`
+	EndpointSelfUser       = EndpointUser + "self/"      // Value: https://paste.myst.rs/api/v2/user/self/
+	EndpointSelfUserPastes = EndpointSelfUser + "pastes" // Value: https://paste.myst.rs/api/v2/user/self/pastes
+)
 
-	TimeExpiresInToUnix string = TimeEndpoint + `expiresInToUnixTime`
+var (
+	// EndpointPaste - Value: https://paste.myst.rs/api/v2/paste/{pasteId}
+	EndpointPaste = func(pasteId string) string {
+		return fmt.Sprintf("%spaste/%s", EndpointBase, pasteId)
+	}
+	// DataLanguageByName - Value:
+	// https://paste.myst.rs/api/v2/data/language?name={name}
+	DataLanguageByName = func(name string) string {
+		return fmt.Sprintf("%slanguage?name=%s", EndpointData, url.QueryEscape(name))
+	}
+
+	// DataLanguageByExt - Value:
+	// https://paste.myst.rs/api/v2/data/languageExt?extension={extension}
+	DataLanguageByExt = func(extension string) string {
+		return fmt.Sprintf("%slanguageExt?extension=%s", EndpointData, url.QueryEscape(extension))
+	}
+
+	// TimeExpiresInToUnix - Value:
+	// https://paste.myst.rs/api/v2/time/expiresInToUnixTime/?createdAt={createdAt}&expiresIn={expiresIn}
+	TimeExpiresInToUnix = func(createdAt uint64, expires string) string {
+		return fmt.Sprintf("%sexpiresInToUnixTime?createdAt=%d&expiresIn=%s", EndpointTime, createdAt, expires)
+	}
 )
