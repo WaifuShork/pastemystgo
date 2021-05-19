@@ -6,7 +6,8 @@ import (
 	"github.com/waifushork/pastemystgo"
 )
 
-// For new pastes ensure that the max paste lifetime is 1m for courtesy of paste space.
+// For new pastes ensure that the max paste lifetime is 1h for courtesy of paste space.
+
 func TestGetPaste(t *testing.T) {
 	tests := []struct{
 		id    string
@@ -25,7 +26,7 @@ func TestGetPaste(t *testing.T) {
 	for _, tt := range tests { 
 		paste, err := client.GetPaste(tt.id)
 		if err != nil { 
-			t.Error(err)
+			panic(err)
 		}
 
 		if paste == nil { 
@@ -72,7 +73,7 @@ func TestCreatePrivatePaste(t *testing.T) {
 	}
 	
 	createInfo := pastemystgo.PasteCreateInfo{
-		Title:     "api test paste",
+		Title:     "pastemystgotest",
 		ExpiresIn: "1h",
 		IsPrivate: true,
 		IsPublic:  false,
@@ -101,7 +102,7 @@ func TestDeletePaste(t *testing.T) {
 	}
 	
 	createInfo := pastemystgo.PasteCreateInfo{
-		Title:     "api test paste",
+		Title:     "pastemystgotest",
 		ExpiresIn: "1h",
 		IsPrivate: false,
 		IsPublic:  false,
@@ -137,7 +138,7 @@ func TestEditPaste(t *testing.T) {
 	paste, _ := client.CreatePaste(createInfo)
 	paste.Title = "edited title"
 
-	newPaste, _ := client.EditPaste(*paste)
+	newPaste, _ := client.EditPaste(paste)
 	if newPaste.Title != "edited title" {
 		t.Errorf("Paste was not edited")
 	}

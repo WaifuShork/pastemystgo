@@ -1,5 +1,6 @@
 # Configs
 .vscode
+.idea
 _sensitive.json
 
 # Binaries for programs and plugins
