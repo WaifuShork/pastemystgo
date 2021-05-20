@@ -1,12 +1,15 @@
 package tests
 
 import (
-	"testing"
-
 	"github.com/waifushork/pastemystgo"
+	"os"
+	"testing"
+	"time"
 )
 
-func TestTimeExpiresInProperly(t *testing.T) { 
+func TestTimeExpiresInProperly(t *testing.T) {
+	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
+
 	tests := []struct {
 		createdAt uint64
 		expiresIn pastemystgo.ExpiresIn
@@ -37,7 +40,8 @@ func TestTimeExpiresInProperly(t *testing.T) {
 	for _, tt := range tests { 
 		value, _ := client.ExpiresInToUnixTime(tt.createdAt, tt.expiresIn)
 		if value != tt.expected { 
-			t.Errorf("Time format incorrect %d", value)
+			t.Errorf("time format incorrect %d", value)
 		}
 	}
+	time.Sleep(time.Second)
 }

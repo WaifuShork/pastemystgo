@@ -20,7 +20,7 @@ type User struct {
 	// Specifies how long the user has been a support for, 0 if not a supporter
 	SupporterLength uint64 `json:"supporterLength"`
 	// Specifies if the user is a contributor
-	IsContributor   bool   `json:"contributor,omitempty"`
+	IsContributor   bool   `json:"contributor"`
 
 	// These are additional fields for self user features
 
@@ -36,15 +36,23 @@ type User struct {
 //  ([]string, error)
 func (c *Client) GetSelfUser() (user *User, err error) {
 	if !c.IsAuthorized() {
-		return nil, err//newErrorf("error: no API token has been provided")
+		return nil, err
 	}
 
 	err = c.get(EndpointSelfUser, &user)
 	if err != nil {
-		return nil, err//newError(err)
+		return nil, err
 	}
 
 	return user, nil
+}
+
+func (c *Client) TryGetSelfUser() (user *User, ok bool) {
+	user, err := c.GetSelfUser()
+	if err != nil {
+		return nil, false
+	}
+	return user, true
 }
 
 // GetSelfPasteIds gets all of the currently logged in users paste Ids,
@@ -56,14 +64,23 @@ func (c *Client) GetSelfUser() (user *User, err error) {
 // Remarks: this will return ALL paste ids, use with caution.
 func (c *Client) GetSelfPasteIds() (pastes []string, err error) {
 	if !c.IsAuthorized() {
-		return nil, err//newErrorf("error: no API token has been provided")
+		return nil, err
 	}
 
 	err = c.get(EndpointSelfUserPastes, &pastes)
 	if err != nil {
-		return nil, err //newError(err)
+		return nil, err
 	}
 	return pastes, nil
+}
+
+func (c *Client) TryGetSelfPasteIds() (pastes []string, ok bool) {
+	pastes, err := c.GetSelfPasteIds()
+	if err != nil {
+		return nil, false
+	}
+
+	return pastes, true
 }
 
 // GetSelfPastes gets all of the currently logged in users pastes,
@@ -77,18 +94,18 @@ func (c *Client) GetSelfPasteIds() (pastes []string, err error) {
 // use with caution, you will be rate-limited.
 func (c *Client) GetSelfPastes() (pastes []*Paste, err error) {
 	if !c.IsAuthorized() {
-		return nil, err//newErrorf("error: no API token has been provided")
+		return nil, err
 	}
 
 	pasteIds, err := c.GetSelfPasteIds()
 	if err != nil {
-		return nil, err//newError(err)
+		return nil, err
 	}
 
 	for i := range pasteIds {
 		paste, err := c.GetPaste(pasteIds[i])
 		if err != nil {
-			return nil, err//newError(err)
+			return nil, err
 		}
 
 		pastes = append(pastes, paste)
@@ -97,9 +114,30 @@ func (c *Client) GetSelfPastes() (pastes []*Paste, err error) {
 	return pastes, nil
 }
 
-func (c *Client) GetSelfPastesByAmount(amount int) (pastes []*Paste, err error) {
+func (c *Client) TryGetSelfPastes() (pastes []*Paste, ok bool) {
+	pastes, err := c.GetSelfPastes()
+	if err != nil {
+		return nil, false
+	}
+	return pastes, true
+}
+
+// GetSelfPastesByAmount gets a specific amount of the currently logged in users pastes,
+// this function is not available if no token is available
+//
+// Params:
+//  (amount uint)
+//
+// Returns:
+//  ([]*Paste, error)
+//
+// Remarks: this is a HEAVY function depending on the amount of pastes you specify,
+// use with caution, you will be rate-limited.
+//
+// Addendum: uint parameter because there will never be negative pastes on your account
+func (c *Client) GetSelfPastesByAmount(amount uint) (pastes []*Paste, err error) {
 	if !c.IsAuthorized() {
-		return nil, err//newErrorf("error: no API token has been provided")
+		return nil, err
 	}
 
 	pastes, err = c.GetSelfPastes()
@@ -108,6 +146,48 @@ func (c *Client) GetSelfPastesByAmount(amount int) (pastes []*Paste, err error) 
 	}
 
 	return pastes[:amount], nil
+}
+
+func (c *Client) TryGetSelfPastesByAmount(amount uint) (pastes []*Paste, ok bool) {
+	pastes, err := c.GetSelfPastesByAmount(amount)
+	if err != nil {
+		return nil, false
+	}
+	return pastes, true
+}
+
+// GetSelfPasteIdsByAmount gets a specific amount of the currently logged in user paste ids,
+// this function is not available if no token is available
+//
+// Params:
+//  (amount uint)
+//
+// Returns:
+//  ([]string, error)
+//
+// Remarks: this is a HEAVY function depending on the amount of pastes you specify,
+// use with caution, you will be rate-limited.
+//
+// Addendum: uint parameter because there will never be negative pastes on your account
+func (c *Client) GetSelfPasteIdsByAmount(amount uint) (pastes []string, err error) {
+	if !c.IsAuthorized() {
+		return nil, err
+	}
+
+	pastes, err = c.GetSelfPasteIds()
+	if err != nil {
+		return nil, err
+	}
+
+	return pastes[:amount], nil
+}
+
+func (c *Client) TryGetSelfPasteIdsByAmount(amount uint) (pastes []string, ok bool) {
+	pastes, err := c.GetSelfPasteIdsByAmount(amount)
+	if err != nil {
+		return nil, false
+	}
+	return pastes, true
 }
 
 // UserExists checks if a given user exists based on a username
@@ -121,11 +201,11 @@ func (c *Client) GetSelfPastesByAmount(amount int) (pastes []*Paste, err error) 
 // Remarks: the user account MUST be public, or you must be accessing your own
 // account while signed in with your API token.
 func (c *Client) UserExists(username string) (bool, error) {
-	url := EndpointUser + url.QueryEscape(username) + "/exists"
+	endpointUrl := EndpointUser + url.QueryEscape(username) + "/exists"
 
-	request, err := http.Get(url)
+	request, err := http.Get(endpointUrl)
 	if err != nil { 
-		return false, err//newError(err)
+		return false, err
 	}
 
 	return request.StatusCode == http.StatusOK, nil
@@ -133,7 +213,7 @@ func (c *Client) UserExists(username string) (bool, error) {
 
 // GetUser gets a user by their username
 //
-// User will be nil if they don't have a public profile yet. 
+// User will be nil if they don't have a public profile.
 //
 // Params:
 // 	(username string)
@@ -141,11 +221,11 @@ func (c *Client) UserExists(username string) (bool, error) {
 // Returns:
 //  (*User, error)
 func (c *Client) GetUser(username string) (user *User, err error) {
-	url := EndpointUser + url.QueryEscape(username)
+	endpointUrl := EndpointUser + url.QueryEscape(username)
 
-	err = c.get(url, &user)
+	err = c.get(endpointUrl, &user)
 	if err != nil { 
-		return nil, err//newError(err)
+		return nil, err
 	}
 
 	return user, nil
@@ -153,13 +233,13 @@ func (c *Client) GetUser(username string) (user *User, err error) {
 
 // TryGetUser attempts to get a user by their username
 //
-// User will be nil if they don't have a public profile yet. 
+// User will be nil if they don't have a public profile.
 //
 // Params:
 //  (username string)
 //
 // Returns:
-//  (*User, bool, error)
+//  (*User, bool)
 func (c *Client) TryGetUser(username string) (*User, bool) {
 	user, err := c.GetUser(username)
 	if err != nil { 

@@ -1,5 +1,9 @@
 package pastemystgo
 
+import (
+	"errors"
+)
+
 // ExpiresIn represents all the possible time formats
 // for when a paste will expire.
 type ExpiresIn int
@@ -93,15 +97,15 @@ type PastyCreateInfo struct {
 // PasteCreateInfo represents the information needed to create a new paste
 type PasteCreateInfo struct { 
 	// Title represents the title of the paste -- optional
-	Title     string            `json:"title"`
+	Title     string            `json:"title,omitempty"`
 	// ExpiresIn represents when the paste will expire -- optional
-	ExpiresIn string            `json:"expiresIn"`
+	ExpiresIn string            `json:"expiresIn,omitempty"`
 	// IsPrivate represents if it is accessible by the owner -- optional
-	IsPrivate bool              `json:"isPrivate"`
+	IsPrivate bool              `json:"isPrivate,omitempty"`
 	// IsPublic represents if it is displayed on the owners public profile -- optional
-	IsPublic  bool              `json:"isPublic"`
+	IsPublic  bool              `json:"isPublic,omitempty"`
 	// Tags represents comma separated paste tags -- optional
-	Tags      string            `json:"tags"`
+	Tags      string            `json:"tags,omitempty"`
 	// Pasties represents a slice of pasties -- mandatory
 	Pasties   []PastyCreateInfo `json:"pasties"`
 }
@@ -118,10 +122,26 @@ func (c *Client) GetPaste(pasteId string) (paste *Paste, err error) {
 
 	err = c.get(url, &paste)
 	if err != nil {
-		return nil, err//newError(err)
+		return nil, err
 	}
 
 	return paste, nil
+}
+
+// TryGetPaste attempts to get a paste based on Id, a token is mandatory for accessing private pastes.
+//
+// Params:
+// 	(pasteId string)
+//
+// Returns:
+//  (*Paste, bool)
+func (c *Client) TryGetPaste(pasteId string) (paste *Paste, ok bool) {
+	paste, err := c.GetPaste(pasteId)
+	if err != nil {
+		return nil, false
+	}
+
+	return paste, true
 }
 
 // CreatePaste creates a new paste with the given PasteCreateInfo
@@ -139,7 +159,7 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (paste *Paste, err erro
 	// then these flags aren't allowed to be true. 
 	if (createInfo.IsPrivate || createInfo.IsPublic || createInfo.Tags != "") && 
 	   (*c.Token == "" || c.Token == nil) {
-		return nil, err//newErrorf("error: cannot use account features without a valid token")
+		return nil, err
 	}
 
 	// url for where the paste will go
@@ -147,10 +167,18 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (paste *Paste, err erro
 
 	err = c.post(url, createInfo, &paste)
 	if err != nil { 
-		return nil, err//newError(err)
+		return nil, err
 	}
 	
 	return paste, nil
+}
+
+func (c *Client) TryCreatePaste(createInfo PasteCreateInfo) (paste *Paste, ok bool) {
+	paste, err := c.CreatePaste(createInfo)
+	if err != nil {
+		return nil, false
+	}
+	return paste, true
 }
 
 // DeletePaste deletes a paste with a specified account token -- mandatory
@@ -167,15 +195,26 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (paste *Paste, err erro
 // Returns:
 //  (error)
 func (c *Client) DeletePaste(pasteId string) error {
-	url := EndpointPaste(pasteId)
-	
-	ok, err := c.delete(url)
-
-	if !ok || err != nil {
-		return err//newErrorf("error: unable to delete paste:\n%v", err)
+	_, ok := c.TryGetPaste(pasteId)
+	if !ok {
+		return errors.New("error: unable to locate the paste to delete, please ensure that you're attempting to delete a valid paste")
 	}
 
+	url := EndpointPaste(pasteId)
+
+	ok, err := c.delete(url)
+	if !ok || err != nil {
+		return err
+	}
 	return nil
+}
+
+func (c *Client) TryDeletePaste(pasteId string) bool {
+	err := c.DeletePaste(pasteId)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 // EditPaste edits a paste with a specified account token -- mandatory
@@ -193,13 +232,44 @@ func (c *Client) DeletePaste(pasteId string) error {
 // Returns:
 //  (*Paste, error)
 func (c *Client) EditPaste(paste *Paste) (*Paste, error) {
-	// url for where the paste will go
+	_, ok := c.TryGetPaste(paste.Id)
+
+	if !ok {
+		return nil, errors.New("error: unable to locate the paste to delete, please ensure that you're attempting to delete a valid paste")
+	}
+
 	url := EndpointPaste(paste.Id)
 
 	err := c.patch(url, &paste)
 	if err != nil {
-		return nil, err//newError(err)
+		return nil, err
 	}
 
 	return paste, nil
+}
+
+func (c *Client) TryEditPaste(paste *Paste) (*Paste, bool) {
+	editedPaste, err := c.EditPaste(paste)
+	if err != nil {
+		return nil, false
+	}
+	return editedPaste, true
+}
+
+func (c *Client) BulkDeletePastes(pastes []string) error {
+	for _, paste := range pastes {
+		err := c.DeletePaste(paste)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Client) TryBulkDeletePastes(pastes []string) bool {
+	err := c.BulkDeletePastes(pastes)
+	if err != nil {
+		return false
+	}
+	return true
 }

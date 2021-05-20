@@ -49,11 +49,11 @@ func DeleteClient(client *Client) {
 func (c *Client) get(url string, pattern interface{}) error {
 	response, err := c.makeRequest(url, GET, nil, &pattern)
 	if err != nil {
-		return err//newError(err)
+		return err
 	}
 
 	if response.StatusCode != http.StatusOK { 
-		return err//newErrorf("Error: Expected 200\nGot: %v", response.StatusCode)
+		return err
 	}
 
 	return nil
@@ -62,11 +62,11 @@ func (c *Client) get(url string, pattern interface{}) error {
 func (c *Client) post(url string, body interface{}, pattern interface{}) error {
 	response, err := c.makeRequest(url, POST, body, &pattern)
 	if err != nil { 
-		return err//newError(err)
+		return err
 	}
 	
 	if response.StatusCode != http.StatusOK { 
-		return err//newErrorf("Error: Expected 200\nGot: %v", response.StatusCode)
+		return err
 	}
 
 	return nil
@@ -75,11 +75,11 @@ func (c *Client) post(url string, body interface{}, pattern interface{}) error {
 func (c *Client) patch(url string, body interface{}) error {
 	response, err := c.makeRequest(url, PATCH, body, nil)
 	if err != nil { 
-		return err//newError(err)
+		return err
 	}
 
 	if response.StatusCode != http.StatusOK { 
-		return err//newErrorf("Error: Expected 200\nGot: %v", response.StatusCode)
+		return err
 	}
 
 	return nil
@@ -88,7 +88,7 @@ func (c *Client) patch(url string, body interface{}) error {
 func (c *Client) delete(url string) (bool, error) {
 	response, err := c.makeRequest(url, DELETE, nil, nil)
 	if err != nil {
-		return false, err//newError(err)
+		return false, err
 	}
 
 	return response.StatusCode == http.StatusOK, nil
@@ -109,14 +109,14 @@ func (c *Client) makeRequest(url string, method RequestMethod, body interface{},
 	if body != nil {
 		err := json.NewEncoder(jsonBody).Encode(&body)
 		if err != nil {
-			return nil, err//newError(err)
+			return nil, err
 		}
 	}
 
 	// It's possible body to be nil, considering not everything requires a pattern body.
 	request, err := http.NewRequest(reqMethod, url, bytes.NewBuffer(jsonBody.Bytes()))
 	if err != nil { 
-		return nil, err//newError(err)
+		return nil, err
 	}
 
 	// Apply headers
@@ -129,13 +129,13 @@ func (c *Client) makeRequest(url string, method RequestMethod, body interface{},
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil { 
-		return nil, err//newError(err)
+		return nil, err
 	}
 
 	if body != nil || outPattern != nil {
 		err = c.bodyToJson(response, &outPattern)
 		if err != nil {
-			return nil, err//newError(err)
+			return nil, err
 		}
 	}
 

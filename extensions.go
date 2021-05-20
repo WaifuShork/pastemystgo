@@ -3,8 +3,6 @@ package pastemystgo
 // A collection of extension tools used throughout the pastemystgo library
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -82,29 +80,4 @@ func (c *Client) postBodyToJson(client http.Client, request *http.Request, patte
 	} (response.Body)
 
 	return c.bodyToJson(response, pattern)
-}
-
-// Wraps errors.New(error) so you can easily throw a new error without 
-// dealing with formatting a message before feeding it to the method.
-//
-// Params:
-// 	(message string, err ...interface{})
-//
-// Returns:
-//  (error)
-func newErrorf(message string, err ...interface{}) error {
-	return errors.New(fmt.Sprintln(message, err))
-}
-
-// Wraps newErrorf for simplicity. Instead of being forced to string
-// format on every call, you can simply pass the error message.  
-// Properly prints the value of the error with default formatting as well.  
-//
-// Params:
-// 	(err error)
-//
-// Returns:
-//  (error)
-func newError(err error) error {
-	return newErrorf("%v", err)
 }
