@@ -17,4 +17,4 @@ if err != nil {
 }
 ```
 
-| [data](data.md) | [paste](paste.md) | [user](user.md)
+| [data](data.md) | [paste](paste.md) | [user](user.md) | 

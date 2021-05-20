@@ -59,4 +59,4 @@ Please note that getting an extension by name must be done by its "pretty name",
 > 
 > Some languages will not be retrievable.
 
-| [paste](paste.md) | [time](time.md) | [user](user.md)
+| [paste](paste.md) | [time](time.md) | [user](user.md) |
