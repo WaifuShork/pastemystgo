@@ -1,12 +1,15 @@
-<h1 align="center">Paste</h1>
+---
+title: Paste
+sidebar_position: 4
+---
 
 Paste contains several crucial functions related to creating, deleting, editing, and getting pastes. If you wish to create/edit a private paste, or delete a private/public paste, you need to be using an API key as these are restricted to account features.
 
-> Note: 
-> 
-> Ensure that you have an active client. 
+:::info 
+Ensure that you have an active [Client](02-client.md). 
+:::
 
-Golang struct representation of a Paste:
+### Paste struct
 ```go
 type Paste struct {
 	Id          string    
@@ -25,7 +28,7 @@ type Paste struct {
 }
 ```
 
-Getting a paste using an Id:
+### Getting a paste
 ```go
 func (c *Client) GetPaste(id string) (*Paste, error)
 func (c *Client) TryGetPaste(id string) (*Paste, book)
@@ -42,7 +45,7 @@ if !ok {
 }
 ```
 
-Creating a paste from scratch:
+### Creating a paste
 ```go
 func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error)
 func (c *Client) TryCreatePaste(createInfo PasteCreateInfo) (*Paste, bool)
@@ -76,7 +79,7 @@ if !ok {
 }
 ```
 
-Deleting a paste:
+### Deleting a paste
 ```go
 func (c *Client) DeletePaste(id string) error
 func (c *Client) TryDeletePaste(id string) bool
@@ -93,7 +96,7 @@ if !ok {
 }
 ```
 
-Bulk deleting pastes:
+### Bulk deleting pastes
 ```go
 func (c *Client) BulkDeletePastes(pastes []string) error
 func (c *Client) TryBulkDeletePastes(pastes []string) book
@@ -110,7 +113,7 @@ if !ok {
 }
 ```
 
-Editing a paste:
+### Editing a paste
 ```go
 func (c *Client) EditPaste(paste Paste) (*Paste, error)
 func (c *Client) TryEditPaste(paste Paste) (*Paste, book)
@@ -133,7 +136,8 @@ if !ok {
     fmt.Errorf("unable to edit paste")
 }
 ```
-Golang enum representation of ExpiresIn:
+
+### ExpiresIn enum
 ```go
 // ExpiresIn represents all the possible time formats
 // for when a paste will expire.
@@ -150,5 +154,3 @@ const (
 	OneYear  // string form -> "1y"
 )
 ```
-
-| [data](data.md) | [time](time.md) | [user](user.md) | 

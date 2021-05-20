@@ -1,45 +1,33 @@
-<h1 align="center">Welcome to PasteMystGo</h1>
+# Website
 
-Each module consists of related helper functions for accessing the PasteMyst API.
-The PasteMystGo API wrapper consists of four main modules, data, time, user, and paste. To get started with a specific module pick one from the list, or continue reading this page.
+This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
-* [Data](data.md)
-* [Time](time.md)
-* [User](user.md)
-* [Paste](paste.md)
+## Installation
 
-<h2>Preamble</h2>
-
-When you initially create a pastemyst session, you'll have the option to provide a "token", the following features are available to use without a token: 
-* Creating a public paste
-* Getting a public paste
-* Getting when a paste expires 
-
-The following features are unavailable to use without a token:
-* Creating a private paste
-* Getting a private paste
-* Editing a private/public paste
-* Deleting a public/private paste
-
-You can get a token for the API [here](https://paste.myst.rs/user/settings). 
-
-> Important Note: API access is restricted to 5 requests per second. When you exceed this limit, you will get "StatusCode 429 (too many requests)". Contact [CodeMyst](https://github.com/CodeMyst) to request more.  
-
-For more information on the underlying API itself, please refer to the [pastemyst website](https://paste.myst.rs/api-docs/index). 
-
-<h2>The Backend Client</h2>
-
-PasteMystGo is powered by a back-end client/runner, this system is responsible for ensuring safety among API access. 
-
-```go
-client := pastemystgo.NewClient("API-Token")
+```console
+yarn install
 ```
 
-Once you've registered a client, you can access all the PasteMystGo API features available without worry. Passing an empty string for the token means you won't get access to the account related features as mentioned above. It's best to declare your client in the global scope to ensure you only ever have one client active. To mark an active client for deletion, you may do the following:
+## Local Development
 
-```go
-client.DeleteClient()
+```console
+yarn start
 ```
 
-It is recommended to delete a client when you're no longer using it. If you create a client while inside a Goroutine, there's no need to delete it manually, since the Goroutine will handle deletion.
+This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
+## Build
+
+```console
+yarn build
+```
+
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
+
+## Deployment
+
+```console
+GIT_USER=<Your GitHub username> USE_SSH=true yarn deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.

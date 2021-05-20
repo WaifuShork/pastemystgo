@@ -1,12 +1,15 @@
-<h1 align="center">User</h1>
+---
+title: User
+sidebar_position: 6
+---
 
 User contains several functions related to ensuring a user exists, getting a user via username, and getting a collection of the users pastes or paste ids.
 
-> Note: 
-> 
-> Ensure that you have an active client. 
+:::info 
+Ensure that you have an active [Client](02-client.md). 
+:::
 
-Golang struct representation of a User:
+### User struct
 ```go
 type User struct {
 	Id              string 
@@ -19,7 +22,7 @@ type User struct {
 }
 ```
 
-Ensure user exists:
+### Ensure user exists
 ```go
 func (c *Client) UserExists(username string) (bool, error)
 ```
@@ -30,7 +33,7 @@ if err != nil || !ok {
 }
 ```
 
-Get user with a username:
+### Get a user
 ```go
 func (c *Client) GetUser(username string) (*User, error)
 func (c *Client) TryGetUser(username string) (*User, bool)
@@ -46,7 +49,8 @@ if !ok {
     fmt.Errorf("unable to get user")
 }
 ```
-Get self user: 
+
+### Get self user 
 ```go
 func (c *Client) GetSelfUser() (*User, error)
 func (c *Client) TryGetSelfUser() (*User, bool)
@@ -63,7 +67,7 @@ if !ok {
 }
 ```
 
-Get self user pastes:
+### Get self user pastes
 ```go
 func (c *Client) GetSelfPasteIds() ([]string, error)
 func (c *Client) TryGetSelfPasteIds() ([]string, bool)
@@ -115,10 +119,6 @@ if !ok {
 }
 ```
 
-
-<h2>Important Remarks</h2>
+### Important Remarks
 
 A user must have a public account to be located or retrieved.
-
-
-| [data](data.md) | [paste](paste.md) | [time](time.md) |

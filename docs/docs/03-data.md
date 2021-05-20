@@ -1,12 +1,15 @@
-<h1 align="center">Data</h1>
+---
+title: Data
+sidebar_position: 3
+---
 
-Data contains several crucial functions related to fetching languages. You can get a language by either it's name, or extension. You can get the full list of languages and extensions [here](https://github.com/CodeMyst/pastemyst/blob/main/data/languages.json). 
+Data contains all the functions you need for getting a language. You can get a language by either it's name, or extension. You can get the full list of languages and extensions [here](https://github.com/CodeMyst/pastemyst/blob/main/data/languages.json). 
 
-> Note: 
-> 
-> Ensure that you have an active client. 
+:::info 
+Ensure that you have an active [Client](02-client.md). 
+:::
 
-Golang struct representation of a Language:
+### Language struct
 ```go
 type Language struct {
 	Name       string   
@@ -17,7 +20,7 @@ type Language struct {
 }
 ```
 
-Getting a language by its name.
+### Getting a language by its name
 ```go
 func (c *Client) GetLanguageByName(name string) (*Language, error)
 func (c *Client) TryGetLanguageByName(name string) (*Language, bool)
@@ -34,7 +37,7 @@ if !ok {
 }
 ```
 
-Getting a language by its extension.
+### Getting a language by its extension
 ```go
 func (c *Client) GetLanguageByExtension(extension string) (*Language, error)
 func (c *Client) TryGetLanguageByExtension(extension string) (*Language, bool)
@@ -51,12 +54,10 @@ if !ok {
 }
 ```
 
-<h2>Important Remarks</h2>
+### Important Remarks
 
 Please note that getting an extension by name must be done by its "pretty name", such as "C#" or "C++", and extension must be in lowercase. 
 
-> Known Bugs:
-> 
-> Some languages will not be retrievable.
-
-| [paste](paste.md) | [time](time.md) | [user](user.md) |
+:::warning Known Bugs:
+Some languages will not be retrievable.
+::: 
