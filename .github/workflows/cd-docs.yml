@@ -5,7 +5,7 @@ on:
 
     push:
         branches:
-            - main
+            - master
         # Ensure that the documentation can be rebuilt on documentation and library source changes.
         paths:
             - "docs/**"
