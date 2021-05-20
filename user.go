@@ -33,7 +33,7 @@ type User struct {
 // GetSelfUser gets the currently logged in user, this function is not available if no token is available
 //
 // Returns:
-//  ([]string, error)
+//  (*User, error)
 func (c *Client) GetSelfUser() (user *User, err error) {
 	if !c.IsAuthorized() {
 		return nil, err
@@ -47,6 +47,10 @@ func (c *Client) GetSelfUser() (user *User, err error) {
 	return user, nil
 }
 
+// TryGetSelfUser attempts to get the currently logged in user, this function is not available if no token is available
+//
+// Returns:
+//  (*User, bool)
 func (c *Client) TryGetSelfUser() (user *User, ok bool) {
 	user, err := c.GetSelfUser()
 	if err != nil {
@@ -74,6 +78,13 @@ func (c *Client) GetSelfPasteIds() (pastes []string, err error) {
 	return pastes, nil
 }
 
+// TryGetSelfPasteIds attempts to get all of the currently logged in users paste Ids,
+// this function is not available if no token is available
+//
+// Returns:
+//  ([]string, bool)
+//
+// Remarks: this will return ALL paste ids, use with caution.
 func (c *Client) TryGetSelfPasteIds() (pastes []string, ok bool) {
 	pastes, err := c.GetSelfPasteIds()
 	if err != nil {
@@ -114,6 +125,15 @@ func (c *Client) GetSelfPastes() (pastes []*Paste, err error) {
 	return pastes, nil
 }
 
+// TryGetSelfPastes attempts to get all of the currently logged in users pastes,
+// this function is not available if no token is available
+//
+// Returns:
+//  ([]*Paste, bool)
+//
+// Remarks: this is a HEAVY function depending on the amount of pastes you have on your account,
+// it will fetch all the paste ids, and convert them into actual paste objects.
+// use with caution, you will be rate-limited.
 func (c *Client) TryGetSelfPastes() (pastes []*Paste, ok bool) {
 	pastes, err := c.GetSelfPastes()
 	if err != nil {
@@ -148,6 +168,19 @@ func (c *Client) GetSelfPastesByAmount(amount uint) (pastes []*Paste, err error)
 	return pastes[:amount], nil
 }
 
+// TryGetSelfPastesByAmount attempts to get a specific amount of the currently logged in users pastes,
+// this function is not available if no token is available
+//
+// Params:
+//  (amount uint)
+//
+// Returns:
+//  ([]*Paste, error)
+//
+// Remarks: this is a HEAVY function depending on the amount of pastes you specify,
+// use with caution, you will be rate-limited.
+//
+// Addendum: uint parameter because there will never be negative pastes on your account
 func (c *Client) TryGetSelfPastesByAmount(amount uint) (pastes []*Paste, ok bool) {
 	pastes, err := c.GetSelfPastesByAmount(amount)
 	if err != nil {
@@ -182,6 +215,19 @@ func (c *Client) GetSelfPasteIdsByAmount(amount uint) (pastes []string, err erro
 	return pastes[:amount], nil
 }
 
+// TryGetSelfPasteIdsByAmount attempts to get a specific amount of the currently logged in user paste ids,
+// this function is not available if no token is available
+//
+// Params:
+//  (amount uint)
+//
+// Returns:
+//  ([]string, bool)
+//
+// Remarks: this is a HEAVY function depending on the amount of pastes you specify,
+// use with caution, you will be rate-limited.
+//
+// Addendum: uint parameter because there will never be negative pastes on your account
 func (c *Client) TryGetSelfPasteIdsByAmount(amount uint) (pastes []string, ok bool) {
 	pastes, err := c.GetSelfPasteIdsByAmount(amount)
 	if err != nil {

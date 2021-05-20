@@ -1,6 +1,7 @@
 clean:
 	go clean -cache
 
+.SILENT: test
 test:
 	go test -run TestGetLanguageByExtension ./internal/tests
 	go test -run TestTryGetLanguageByExtension ./internal/tests
