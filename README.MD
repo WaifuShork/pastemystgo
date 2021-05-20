@@ -18,4 +18,7 @@ A small, fast, reliable pastemyst API wrapper written in Golang. </br>
 Official pastemyst API docs found <a href="https://paste.myst.rs/api-docs/index">here</a>.
 </p>
 
-[Library Docs](docs/README.md)
+<p align="center">
+PasteMystGo provides low-level, stable, and fast bindings for the <a href="https://paste.myst.rs/api-docs/index">PasteMyst API</a>. </br>
+To get started check out the <a href="https://github.com/WaifuShork/pastemystgo/tree/master/docs">library docs</a>
+</p>

@@ -16,3 +16,5 @@ if err != nil {
     panic(err)
 }
 ```
+
+| [data](data.md) | [paste](paste.md) | [user](user.md)

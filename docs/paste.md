@@ -1,6 +1,6 @@
 <h1 align="center">Paste</h1>
 
-Paste contains 4 crucial functions related to creating, deleting, editing, and getting pastes. If you wish to create/edit a private paste, or delete a private/public paste, you need to be using an API key as these are restricted to account features.
+Paste contains several crucial functions related to creating, deleting, editing, and getting pastes. If you wish to create/edit a private paste, or delete a private/public paste, you need to be using an API key as these are restricted to account features.
 
 > Note: 
 > 
@@ -28,17 +28,24 @@ type Paste struct {
 Getting a paste using an Id:
 ```go
 func (c *Client) GetPaste(id string) (*Paste, error)
+func (c *Client) TryGetPaste(id string) (*Paste, book)
 ```
 ```go
 paste, err := client.GetPaste("sewevxee")
 if err != nil {
     panic(err)
 }
+
+paste, ok := client.TryGetPaste("sewevxee")
+if !ok { 
+    fmt.Errorf("unable to get paste")
+}
 ```
 
 Creating a paste from scratch:
 ```go
 func (c *Client) CreatePaste(createInfo PasteCreateInfo) (*Paste, error)
+func (c *Client) TryCreatePaste(createInfo PasteCreateInfo) (*Paste, bool)
 ```
 ```go
 pastyCreateInfo := []pastemystgo.PastyCreateInfo{
@@ -62,27 +69,51 @@ paste, err := client.CreatePaste(createInfo)
 if err != nil { 
     panic(err)
 }
+
+paste, ok := client.TryCreatePaste(createInfo)
+if !ok {
+    fmt.Errorf("unable to create paste")
+}
 ```
 
 Deleting a paste:
 ```go
-func (c *Client) DeletePaste(id string) (error)
+func (c *Client) DeletePaste(id string) error
+func (c *Client) TryDeletePaste(id string) bool
 ```
 ```go
-paste, err := client.GetPaste("sewevxee")
+err := client.DeletePaste("sewevxee")
 if err != nil { 
     panic(err)
 }
 
-err := client.DeletePaste(paste.Id)
-if err != nil { 
+ok := client.TryDeletePaste("sewevxee")
+if !ok { 
+    fmt.Errorf("unable to delete paste")
+}
+```
+
+Bulk deleting pastes:
+```go
+func (c *Client) BulkDeletePastes(pastes []string) error
+func (c *Client) TryBulkDeletePastes(pastes []string) book
+```
+```go
+err := client.BulkDeletePastes("sewevxee", "i3dcx8ab", "g36wu5to")
+if err != nil {
     panic(err)
+}
+
+ok := client.TryBulkDeletePastes("sewevxee", "i3dcx8ab", "g36wu5to")
+if !ok {
+    fmt.Errorf("unable to delete pastes")
 }
 ```
 
 Editing a paste:
 ```go
 func (c *Client) EditPaste(paste Paste) (*Paste, error)
+func (c *Client) TryEditPaste(paste Paste) (*Paste, book)
 ```
 ```go
 paste, err := client.GetPaste("sewevxee")
@@ -92,9 +123,14 @@ if err != nil {
 
 paste.Title = "edited title"
 
-editedPaste, err := client.EditPaste(*paste)
+editedPaste, err := client.EditPaste(paste)
 if err != nil {
     panic(err)
+}
+
+editedPaste, ok := client.TryEditPaste(paste)
+if !ok { 
+    fmt.Errorf("unable to edit paste")
 }
 ```
 Golang enum representation of ExpiresIn:
@@ -114,3 +150,5 @@ const (
 	OneYear  // string form -> "1y"
 )
 ```
+
+| [data](data.md) | [time](time.md) | [user](user.md)

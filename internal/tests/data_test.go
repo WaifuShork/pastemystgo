@@ -1,9 +1,10 @@
 package tests
 
 import (
-	"github.com/waifushork/pastemystgo"
 	"os"
 	"testing"
+
+	"github.com/waifushork/pastemystgo"
 )
 
 // Keep the list small due to rate-limiting
