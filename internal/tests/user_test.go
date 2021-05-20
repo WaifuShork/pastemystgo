@@ -10,8 +10,11 @@ import (
 func TestUserExists(t *testing.T) {
 	var client = pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	user, _ := client.UserExists("waifushork")
-	if !user { 
+	user, err := client.UserExists("waifushork")
+	if err != nil {
+		t.Fatal("unable to get user waifushork")
+	}
+	if !user {
 		t.Errorf("problem locating user.")
 	}
 	time.Sleep(time.Second)
@@ -22,7 +25,7 @@ func TestTryGetUser(t *testing.T) {
 
 	user, ok := client.TryGetUser("waifushork")
 	if !ok {
-		t.Errorf("unable to locate user. want=%s, got=%s", "waifushork", user.Username)
+		t.Fatalf("unable to locate user. want=%s, got=%s", "waifushork", user.Username)
 	}
 
 	if user.Username != "WaifuShork" {
@@ -40,7 +43,10 @@ func TestGetUser(t *testing.T) {
 	}
 
 	for _, tt := range tests { 
-		user, _ := client.GetUser(tt)
+		user, err := client.GetUser(tt)
+		if err != nil {
+			t.Fatalf("unable to get user %s", tt)
+		}
 		if !user.PublicProfile {
 			t.Errorf("could not properly get user %s, please ensure their profile is public", tt)
 		}
@@ -51,7 +57,10 @@ func TestGetUser(t *testing.T) {
 func TestGetSelfUser(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	user, _ := client.GetSelfUser()
+	user, err := client.GetSelfUser()
+	if err != nil {
+		t.Fatal("unable to get self user")
+	}
 
 	if user.Username != "WaifuShork" {
 		t.Errorf("username was not correct. want=%v, got=%v", "WaifuShork", user.Username)
@@ -64,7 +73,7 @@ func TestTryGetSelfUser(t *testing.T) {
 
 	user, ok := client.TryGetSelfUser()
 	if !ok {
-		t.Errorf("unable to get self user")
+		t.Fatalf("unable to get self user")
 	}
 
 	if user.Username != "WaifuShork" {
@@ -76,7 +85,10 @@ func TestTryGetSelfUser(t *testing.T) {
 func TestGetSelfPastesByAmount(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	pastes, _ := client.GetSelfPastesByAmount(5)
+	pastes, err := client.GetSelfPastesByAmount(5)
+	if err != nil {
+		t.Fatal("unable get pastes")
+	}
 
 	if len(pastes) != 5 {
 		t.Errorf("wrong paste count. want=%d. got=%d", 5, len(pastes))
@@ -89,7 +101,7 @@ func TestTryGetSelfPastesByAmount(t *testing.T) {
 
 	pastes, ok := client.TryGetSelfPastesByAmount(5)
 	if !ok {
-		t.Errorf("unable to get expected pastes")
+		t.Fatalf("unable to get expected pastes")
 	}
 
 	if len(pastes) != 5 {

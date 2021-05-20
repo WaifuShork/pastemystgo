@@ -77,11 +77,11 @@ func TestTryGetPaste(t *testing.T) {
 	for _, tt := range tests {
 		paste, ok := client.TryGetPaste(tt.id)
 		if !ok {
-			t.Error("unable to get paste")
+			t.Fatal("unable to get paste")
 		}
 
 		if paste == nil {
-			t.Errorf("paste was nil.\n%+v", paste)
+			t.Fatalf("paste was nil.\n%+v", paste)
 		}
 		if paste.Id != tt.id {
 			t.Errorf("incorrect paste id. want=%s, got=%s", tt.id, paste.Id)
@@ -93,7 +93,10 @@ func TestTryGetPaste(t *testing.T) {
 func TestCreatePaste(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	paste, _ := client.CreatePaste(createInfo)
+	paste, err := client.CreatePaste(createInfo)
+	if err != nil {
+		t.Fatal("unable to create paste")
+	}
 
 	if paste.Title != createInfo.Title {
 		t.Errorf("could not create paste\n%+v\ntitle %s", paste, paste.Title)
@@ -106,7 +109,7 @@ func TestTryCreatePaste(t *testing.T) {
 
 	paste, ok := client.TryCreatePaste(createInfo)
 	if !ok {
-		t.Error("unable to create paste")
+		t.Fatal("unable to create paste")
 	}
 
 	if paste.Title != createInfo.Title {
@@ -133,7 +136,10 @@ func TestCreatePrivatePaste(t *testing.T) {
 		},
 	}
 
-	paste, _ := client.CreatePaste(pasteInfo)
+	paste, err := client.CreatePaste(pasteInfo)
+	if err != nil {
+		t.Fatal("unable to create paste for TestCreatePrivatePaste")
+	}
 
 	if paste.Title != createInfo.Title {
 		t.Errorf("could not create paste\n%+v\ntitle %s", paste, paste.Title)
@@ -147,9 +153,13 @@ func TestCreatePrivatePaste(t *testing.T) {
 
 func TestDeletePaste(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
-	
-	paste, _ := client.CreatePaste(createInfo)
-	err := client.DeletePaste(paste.Id)
+
+	paste, err := client.CreatePaste(createInfo)
+	if err != nil {
+		t.Fatal("unable to create paste for TestDeletePaste")
+	}
+
+	err = client.DeletePaste(paste.Id)
 	if err != nil {
 		t.Errorf("paste was not deleted.\npaste id=%s\nerror=\n%s", paste.Id, err)
 	}
@@ -159,7 +169,11 @@ func TestDeletePaste(t *testing.T) {
 func TestTryDeletePaste(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	paste, _ := client.CreatePaste(createInfo)
+	paste, err := client.CreatePaste(createInfo)
+	if err != nil {
+		t.Fatal("unable to create paste for TestTryDeletePaste")
+	}
+
 	ok := client.TryDeletePaste(paste.Id)
 	if !ok {
 		t.Errorf("paste was not deleted.\npaste id=%s", paste.Id)
@@ -170,7 +184,11 @@ func TestTryDeletePaste(t *testing.T) {
 func TestEditPaste(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	paste, _ := client.CreatePaste(createInfo)
+	paste, err := client.CreatePaste(createInfo)
+	if err != nil {
+		t.Fatal("unable to create paste for TestEditPaste")
+	}
+
 	paste.Title = "edited title"
 
 	newPaste, _ := client.EditPaste(paste)
@@ -183,12 +201,16 @@ func TestEditPaste(t *testing.T) {
 func TestTryEditPaste(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	paste, _ := client.CreatePaste(createInfo)
+	paste, err := client.CreatePaste(createInfo)
+	if err != nil {
+		t.Fatal("unable to create paste for TestTryEditPaste")
+	}
+
 	paste.Title = "edited title"
 
 	newPaste, ok := client.TryEditPaste(paste)
 	if !ok {
-		t.Error("unable to edit paste")
+		t.Fatal("unable to edit paste")
 	}
 
 	if newPaste.Title != "edited title" {
@@ -201,17 +223,21 @@ func TestBulkDeletePastes(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 	var pastes []string
 	for i := 0; i <= 5; i++ {
-		paste, _ := client.CreatePaste(createInfo)
+		paste, err := client.CreatePaste(createInfo)
+		if err != nil {
+			t.Fatal("unable to create paste for TestBulkDeletePastes")
+		}
 		pastes = append(pastes, paste.Id)
 	}
 
 	err := client.BulkDeletePastes(pastes)
 	if err != nil {
-		t.Error("unable to delete pastes, an error occurred")
+		t.Fatal("unable to delete pastes, an error occurred")
 	}
 
 	if pastes != nil {
 		paste, _ := client.TryGetPaste(pastes[0])
+
 		if paste.Id != "" {
 			t.Errorf("paste was not successfully deleted. paste id=%s", paste.Id)
 		}
@@ -223,13 +249,16 @@ func TestTryBulkDeletePastes(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 	var pastes []string
 	for i := 0; i <= 5; i++ {
-		paste, _ := client.CreatePaste(createInfo)
+		paste, err := client.CreatePaste(createInfo)
+		if err != nil {
+			t.Fatal("unable to create paste for TestTryBulkDeletePastes")
+		}
 		pastes = append(pastes, paste.Id)
 	}
 
 	ok := client.TryBulkDeletePastes(pastes)
 	if !ok {
-		t.Error("unable to delete pastes, an error occurred")
+		t.Fatal("unable to delete pastes, an error occurred")
 	}
 
 	if pastes != nil {

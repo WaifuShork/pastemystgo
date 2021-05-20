@@ -8,7 +8,7 @@ import (
 
 // Keep the list small due to rate-limiting
 func TestGetLanguage(t *testing.T) {
-	var client = pastemystgo.NewClient(os.Getenv("TOKEN"))
+	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
 	tests := []string { 
 		"Autodetect",
@@ -93,7 +93,7 @@ func TestGetLanguageByExtension(t *testing.T) {
 		}
 	
 		if language == nil {
-			t.Error("unable to get requested language.")
+			t.Fatal("unable to get requested language.")
 		}
 
 		if language.Extensions[0] != tt { 
