@@ -8,26 +8,26 @@ import (
 // User represents a single pastemyst user
 type User struct {
 	// Id of the user
-	Id              string `json:"_id"`
+	Id string `json:"_id"`
 	// Username of the user
-	Username        string `json:"username"`
+	Username string `json:"username"`
 	// Url of the avatar
-	AvatarUrl       string `json:"avatarUrl"`
+	AvatarUrl string `json:"avatarUrl"`
 	// The users default language
-	DefaultLang     string `json:"defaultLang"`
+	DefaultLang string `json:"defaultLang"`
 	// Specifies if their profile is public
-	PublicProfile   bool   `json:"publicProfile"`
+	PublicProfile bool `json:"publicProfile"`
 	// Specifies how long the user has been a support for, 0 if not a supporter
 	SupporterLength uint64 `json:"supporterLength"`
 	// Specifies if the user is a contributor
-	IsContributor   bool   `json:"contributor"`
+	IsContributor bool `json:"contributor"`
 
 	// These are additional fields for self user features
 
 	// Stars represents a list of paste ids the user has starred
-	Stars           []string 	      `json:"stars,omitempty"`
+	Stars []string `json:"stars,omitempty"`
 	// ServiceIds represents user ids of the service the user used to create an account
-	ServiceIds      map[string]string `json:"serviceIds,omitempty"`
+	ServiceIds map[string]string `json:"serviceIds,omitempty"`
 }
 
 // GetSelfUser gets the currently logged in user, this function is not available if no token is available
@@ -160,12 +160,20 @@ func (c *Client) GetSelfPastesByAmount(amount uint) (pastes []*Paste, err error)
 		return nil, err
 	}
 
-	pastes, err = c.GetSelfPastes()
+	pasteIds, err := c.GetSelfPasteIdsByAmount(amount)
 	if err != nil {
 		return nil, err
 	}
 
-	return pastes[:amount], nil
+	for i := range pasteIds {
+		paste, err := c.GetPaste(pasteIds[i])
+		if err != nil {
+			return nil, err
+		}
+
+		pastes = append(pastes, paste)
+	}
+	return pastes, nil
 }
 
 // TryGetSelfPastesByAmount attempts to get a specific amount of the currently logged in users pastes,
@@ -250,7 +258,7 @@ func (c *Client) UserExists(username string) (bool, error) {
 	endpointUrl := EndpointUser + url.QueryEscape(username) + "/exists"
 
 	request, err := http.Get(endpointUrl)
-	if err != nil { 
+	if err != nil {
 		return false, err
 	}
 
@@ -270,7 +278,7 @@ func (c *Client) GetUser(username string) (user *User, err error) {
 	endpointUrl := EndpointUser + url.QueryEscape(username)
 
 	err = c.get(endpointUrl, &user)
-	if err != nil { 
+	if err != nil {
 		return nil, err
 	}
 
@@ -288,7 +296,7 @@ func (c *Client) GetUser(username string) (user *User, err error) {
 //  (*User, bool)
 func (c *Client) TryGetUser(username string) (*User, bool) {
 	user, err := c.GetUser(username)
-	if err != nil { 
+	if err != nil {
 		return nil, false
 	}
 
