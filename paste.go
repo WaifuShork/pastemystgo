@@ -175,6 +175,15 @@ func (c *Client) CreatePaste(createInfo PasteCreateInfo) (paste *Paste, err erro
 	return paste, nil
 }
 
+// TryCreatePaste attempts to create a new paste with the given PasteCreateInfo
+//
+// Posts new pastes to (https://paste.myst.rs/api/v2/paste)
+//
+// Params:
+// 	(createInfo PasteCreateInfo)
+//
+// Returns:
+//  (*Paste, bool)
 func (c *Client) TryCreatePaste(createInfo PasteCreateInfo) (paste *Paste, ok bool) {
 	paste, err := c.CreatePaste(createInfo)
 	if err != nil {
@@ -211,6 +220,19 @@ func (c *Client) DeletePaste(pasteId string) error {
 	return nil
 }
 
+// TryDeletePaste attempts to delete a paste with a specified account token -- mandatory
+//
+// You can only delete pastes on the account of the token that has been passed.
+//
+// A token is required for deleting a paste because this is an account feature.
+//
+// This action is irreversible.
+//
+// Params:
+// 	(pasteId string)
+//
+// Returns:
+//  (bool)
 func (c *Client) TryDeletePaste(pasteId string) bool {
 	err := c.DeletePaste(pasteId)
 	if err != nil {
@@ -250,6 +272,20 @@ func (c *Client) EditPaste(paste *Paste) (*Paste, error) {
 	return paste, nil
 }
 
+// TryEditPaste attempts to edit a paste with a specified account token -- mandatory
+//
+// You can only edit pastes on the account of the token that has been passed.
+//
+// A token is required for editing a paste because this is an account feature.
+//
+// To edit values of a paste you must send back the exact same paste except with the
+// adjusted values, you cannot edit expiration date, any result will have no effect.
+//
+// Params:
+// 	(paste *Paste)
+//
+// Returns:
+//  (*Paste, bool)
 func (c *Client) TryEditPaste(paste *Paste) (*Paste, bool) {
 	editedPaste, err := c.EditPaste(paste)
 	if err != nil {
@@ -258,6 +294,16 @@ func (c *Client) TryEditPaste(paste *Paste) (*Paste, bool) {
 	return editedPaste, true
 }
 
+// BulkDeletePastes deletes X amount of pastes with a given string array of paste Ids.
+// you must specify an account token -- mandatory
+//
+// You can only delete pastes that are on your account
+//
+// Params:
+//  (pastes []string)
+//
+// Returns:
+//  (error)
 func (c *Client) BulkDeletePastes(pastes []string) error {
 	for _, paste := range pastes {
 		err := c.DeletePaste(paste)
@@ -268,6 +314,16 @@ func (c *Client) BulkDeletePastes(pastes []string) error {
 	return nil
 }
 
+// TryBulkDeletePastes attempts to delete X amount of pastes with a given string array of paste Ids.
+// you must specify an account token -- mandatory
+//
+// You can only delete pastes that are on your account
+//
+// Params:
+//  (pastes []string)
+//
+// Returns:
+//  (bool)
 func (c *Client) TryBulkDeletePastes(pastes []string) bool {
 	err := c.BulkDeletePastes(pastes)
 	if err != nil {
@@ -276,6 +332,13 @@ func (c *Client) TryBulkDeletePastes(pastes []string) bool {
 	return true
 }
 
+// PasteExists checks to see if a given paste exists from a pasteId
+//
+// Params:
+// 	(pasteId string)
+//
+// Returns:
+//  (bool)
 func (c *Client) PasteExists(pasteId string) bool {
 	_, ok := c.TryGetPaste(pasteId)
 	if !ok {
