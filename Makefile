@@ -10,6 +10,7 @@ test:
 
 	go test -run TestGetPaste ./internal/tests
 	go test -run TestTryGetPaste ./internal/tests
+	go test -run TestPasteExists ./internal/tests
 
 	go test -run TestCreatePaste ./internal/tests
 	go test -run TestTryCreatePaste ./internal/tests

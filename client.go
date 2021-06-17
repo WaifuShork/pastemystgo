@@ -7,7 +7,8 @@ import (
 	"net/http"
 )
 
-type RequestMethod int 
+type RequestMethod int
+
 const (
 	GET RequestMethod = iota
 	POST
@@ -40,7 +41,7 @@ func NewClient(tok string) *Client {
 // Params:
 //  (client *Client)
 //
-// Remarks: This function should be called when you're done 
+// Remarks: This function should be called when you're done
 // using the client, ensure that cleanup is executed.
 func DeleteClient(client *Client) {
 	client = nil
@@ -52,7 +53,7 @@ func (c *Client) get(url string, pattern interface{}) error {
 		return err
 	}
 
-	if response.StatusCode != http.StatusOK { 
+	if response.StatusCode != http.StatusOK {
 		return err
 	}
 
@@ -61,11 +62,11 @@ func (c *Client) get(url string, pattern interface{}) error {
 
 func (c *Client) post(url string, body interface{}, pattern interface{}) error {
 	response, err := c.makeRequest(url, POST, body, &pattern)
-	if err != nil { 
+	if err != nil {
 		return err
 	}
-	
-	if response.StatusCode != http.StatusOK { 
+
+	if response.StatusCode != http.StatusOK {
 		return err
 	}
 
@@ -74,11 +75,11 @@ func (c *Client) post(url string, body interface{}, pattern interface{}) error {
 
 func (c *Client) patch(url string, body interface{}) error {
 	response, err := c.makeRequest(url, PATCH, body, nil)
-	if err != nil { 
+	if err != nil {
 		return err
 	}
 
-	if response.StatusCode != http.StatusOK { 
+	if response.StatusCode != http.StatusOK {
 		return err
 	}
 
@@ -115,7 +116,7 @@ func (c *Client) makeRequest(url string, method RequestMethod, body interface{},
 
 	// It's possible body to be nil, considering not everything requires a pattern body.
 	request, err := http.NewRequest(reqMethod, url, bytes.NewBuffer(jsonBody.Bytes()))
-	if err != nil { 
+	if err != nil {
 		return nil, err
 	}
 
@@ -128,7 +129,7 @@ func (c *Client) makeRequest(url string, method RequestMethod, body interface{},
 	// Execute actual request
 	client := &http.Client{}
 	response, err := client.Do(request)
-	if err != nil { 
+	if err != nil {
 		return nil, err
 	}
 
@@ -145,14 +146,14 @@ func (c *Client) makeRequest(url string, method RequestMethod, body interface{},
 		if err != nil {
 			panic(err)
 		}
-	} (response.Body)
+	}(response.Body)
 
 	return response, nil
 }
 
 func (c *Client) getRequestMethod(method RequestMethod) string {
 	switch method {
-	case GET: 
+	case GET:
 		return "GET"
 	case POST:
 		return "POST"
@@ -160,7 +161,7 @@ func (c *Client) getRequestMethod(method RequestMethod) string {
 		return "PATCH"
 	case DELETE:
 		return "DELETE"
-	default: 
+	default:
 		// http.NewRequest() should default to "GET" but you should still,
 		// specify a method for clarity on call.
 		return ""

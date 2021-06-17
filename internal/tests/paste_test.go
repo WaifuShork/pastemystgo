@@ -1,10 +1,11 @@
 package tests
 
 import (
-	"github.com/waifushork/pastemystgo"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/waifushork/pastemystgo"
 )
 
 // For new pastes ensure that the max paste lifetime is 1h for courtesy of paste space.
@@ -17,37 +18,46 @@ var createInfo = pastemystgo.PasteCreateInfo{
 	Tags:      "",
 	Pasties: []pastemystgo.PastyCreateInfo{
 		{
-			Title: "pasty1",
+			Title:    "pasty1",
 			Language: "plain text",
-			Code: "asd asd asd",
+			Code:     "asd asd asd",
 		},
 	},
+}
+
+func TestPasteExists(t *testing.T) {
+	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
+	paste, _ := client.CreatePaste(createInfo)
+
+	if !client.PasteExists(paste.Id) {
+		t.Error("Unable to get paste")
+	}
 }
 
 func TestGetPaste(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	tests := []struct{
+	tests := []struct {
 		id    string
 		token string
 	}{
 		{
-			id: "i3dcx8ab",
+			id:    "i3dcx8ab",
 			token: "",
 		},
 		{
-			id: "cwy615yg",
+			id:    "cwy615yg",
 			token: "",
 		},
 	}
 
-	for _, tt := range tests { 
+	for _, tt := range tests {
 		paste, err := client.GetPaste(tt.id)
-		if err != nil { 
+		if err != nil {
 			panic(err)
 		}
 
-		if paste == nil { 
+		if paste == nil {
 			t.Errorf("paste was nil.\n%+v", paste)
 		}
 		if paste.Id != tt.id {
@@ -60,16 +70,16 @@ func TestGetPaste(t *testing.T) {
 func TestTryGetPaste(t *testing.T) {
 	client := pastemystgo.NewClient(os.Getenv("TOKEN"))
 
-	tests := []struct{
+	tests := []struct {
 		id    string
 		token string
 	}{
 		{
-			id: "i3dcx8ab",
+			id:    "i3dcx8ab",
 			token: "",
 		},
 		{
-			id: "cwy615yg",
+			id:    "cwy615yg",
 			token: "",
 		},
 	}
@@ -129,9 +139,9 @@ func TestCreatePrivatePaste(t *testing.T) {
 		Tags:      "",
 		Pasties: []pastemystgo.PastyCreateInfo{
 			{
-				Title: "pasty1",
+				Title:    "pasty1",
 				Language: "plain text",
-				Code: "asd asd asd",
+				Code:     "asd asd asd",
 			},
 		},
 	}
