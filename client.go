@@ -3,8 +3,8 @@ package pastemystgo
 import (
 	"bytes"
 	"encoding/json"
-	"io"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
 type RequestMethod int
@@ -48,12 +48,13 @@ func DeleteClient(client *Client) {
 }
 
 func (c *Client) get(url string, pattern interface{}) error {
+	//response, err := c.makeRequest(url, GET, nil, &pattern)
 	response, err := c.makeRequest(url, GET, nil, &pattern)
 	if err != nil {
 		return err
 	}
 
-	if response.StatusCode != http.StatusOK {
+	if response.StatusCode() != fasthttp.StatusOK {
 		return err
 	}
 
@@ -61,12 +62,12 @@ func (c *Client) get(url string, pattern interface{}) error {
 }
 
 func (c *Client) post(url string, body interface{}, pattern interface{}) error {
-	response, err := c.makeRequest(url, POST, body, &pattern)
+	response, err := c.makeRequest(url, POST, body, &pattern) //c.makeRequest(url, POST, body, &pattern)
 	if err != nil {
 		return err
 	}
 
-	if response.StatusCode != http.StatusOK {
+	if response.StatusCode() != fasthttp.StatusOK {
 		return err
 	}
 
@@ -79,7 +80,7 @@ func (c *Client) patch(url string, body interface{}) error {
 		return err
 	}
 
-	if response.StatusCode != http.StatusOK {
+	if response.StatusCode() != fasthttp.StatusOK {
 		return err
 	}
 
@@ -92,7 +93,7 @@ func (c *Client) delete(url string) (bool, error) {
 		return false, err
 	}
 
-	return response.StatusCode == http.StatusOK, nil
+	return response.StatusCode() == fasthttp.StatusOK, nil
 }
 
 // makeRequest is the back-end for all client actions
@@ -102,7 +103,7 @@ func (c *Client) delete(url string) (bool, error) {
 //
 // Returns:
 //  (*http.Response, error)
-func (c *Client) makeRequest(url string, method RequestMethod, body interface{}, outPattern interface{}) (*http.Response, error) {
+func (c *Client) makeRequest(url string, method RequestMethod, body interface{}, outPattern interface{}) (*fasthttp.Response, error) {
 	reqMethod := c.getRequestMethod(method)
 
 	// Converts the `body interface{}` into a buffer for feeding NewRequest the bytes.
@@ -114,41 +115,32 @@ func (c *Client) makeRequest(url string, method RequestMethod, body interface{},
 		}
 	}
 
-	// It's possible body to be nil, considering not everything requires a pattern body.
-	request, err := http.NewRequest(reqMethod, url, bytes.NewBuffer(jsonBody.Bytes()))
-	if err != nil {
-		return nil, err
-	}
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
 
-	// Apply headers
-	request.Header.Add("Content-Type", "application/json")
+	req.SetRequestURI(url)
+	req.Header.SetMethod(reqMethod)
+	req.Header.Set("Content-Type", "application/json")
 	if *c.Token != "" || c.Token != nil {
-		request.Header.Add("Authorization", *c.Token)
+		req.Header.Add("Authorization", *c.Token)
 	}
 
-	// Execute actual request
-	client := &http.Client{}
-	response, err := client.Do(request)
+	req.AppendBodyString(jsonBody.String())
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	err := fasthttp.Do(req, resp)
 	if err != nil {
 		return nil, err
 	}
 
-	if body != nil || outPattern != nil {
-		err = c.bodyToJson(response, &outPattern)
-		if err != nil {
-			return nil, err
-		}
+	err = c.bodyToJson(resp, &outPattern)
+	if err != nil {
+		return nil, err
 	}
 
-	// P A N I C
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(response.Body)
-
-	return response, nil
+	return resp, nil
 }
 
 func (c *Client) getRequestMethod(method RequestMethod) string {

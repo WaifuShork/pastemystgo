@@ -3,9 +3,8 @@ package pastemystgo
 // A collection of extension tools used throughout the pastemystgo library
 import (
 	"encoding/json"
-	"io"
-	"io/ioutil"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
 // A helper function which wraps json.Unmarshal for readability
@@ -43,14 +42,15 @@ func (c *Client) serializeJson(v interface{}, isIndented bool) ([]byte, error) {
 //
 // Returns:
 //  (error)
-func (c *Client) bodyToJson(response *http.Response, pattern interface{}) error {
+func (c *Client) bodyToJson(response *fasthttp.Response, pattern interface{}) error {
 	// Read the responses body to get the raw text
-	bytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
+	bytes := response.Body()
+	// bytes, err := ioutil.ReadAll(response.Read())
+	/*if err != nil {
 		return err //newErrorf("error reading response body\n%v", err)
-	}
+	}*/
 
-	err = c.deserializeJson(bytes, &pattern)
+	err := c.deserializeJson(bytes, &pattern)
 	if err != nil {
 		return err //newErrorf("error deserializing the Response Body\n%v", err)
 	}
@@ -65,7 +65,7 @@ func (c *Client) bodyToJson(response *http.Response, pattern interface{}) error 
 //
 // Returns:
 //  (error)
-func (c *Client) postBodyToJson(client http.Client, request *http.Request, pattern interface{}) error {
+/*func (c *Client) postBodyToJson(client http.Client, request *fasthttp.Request, pattern interface{}) error {
 	// Post the actual request
 	response, err := client.Do(request)
 	if err != nil {
@@ -80,4 +80,4 @@ func (c *Client) postBodyToJson(client http.Client, request *http.Request, patte
 	}(response.Body)
 
 	return c.bodyToJson(response, pattern)
-}
+}*/
