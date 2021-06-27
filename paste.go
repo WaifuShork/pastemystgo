@@ -29,23 +29,23 @@ type Paste struct {
 	// Owner of the paste, if none then will be " "
 	OwnerId string `json:"ownerId"`
 	// Title of the paste
-	Title string `json:"title"`
+	Title string `json:"title,omitempty"`
 	// Date in unix time when the paste was created
 	CreatedAt uint64 `json:"createdAt"`
 	// When the paste expires
-	ExpiresIn string `json:"expiresIn"`
+	ExpiresIn string `json:"expiresIn,omitempty"`
 	// Date in unix time when the paste will be deleted
 	DeletesAt uint64 `json:"deletesAt"`
 	// Amount of stars the paste has
 	Stars uint64 `json:"stars"`
 	// Is the paste private?
-	IsPrivate bool `json:"isPrivate"`
+	IsPrivate bool `json:"isPrivate,omitempty"`
 	// Is the paste public?
-	IsPublic bool `json:"isPublic"`
+	IsPublic bool `json:"isPublic,omitempty"`
 	// Is the paste encrypted?
 	IsEncrypted bool `json:"encrypted"`
 	// Slices of all tags for this paste
-	Tags []string `json:"tags"`
+	Tags []string `json:"tags,omitempty"`
 	// Slice of all the pasties on the paste
 	Pasties []Pasty `json:"pasties"`
 	// Slice of all edits

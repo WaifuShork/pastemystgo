@@ -9,10 +9,10 @@ type Language struct {
 	// Mimes represents all supported mimes in a slice
 	Mimes []string `json:"mimes"`
 	// Extensions represents all extensions for a language with a given name
-	Extensions []string `json:"ext"`
+	Extensions []string `json:"ext,omitempty"`
 	// Color represents the color language, not guaranteed for every language,
 	// Default will be #FFFFFF if the language doesn't have one.
-	Color string `json:"color"`
+	Color string `json:"color,omitempty"`
 }
 
 // GetLanguageByName gets a language based on its pretty name

@@ -27,11 +27,8 @@ type Client struct {
 // Returns:
 //  (*Client)
 func NewClient(tok string) *Client {
-	var token *string
-	token = &tok
-
 	return &Client{
-		Token: token,
+		Token: &tok,
 	}
 }
 
@@ -43,8 +40,8 @@ func NewClient(tok string) *Client {
 //
 // Remarks: This function should be called when you're done
 // using the client, ensure that cleanup is executed.
-func DeleteClient(client *Client) {
-	client = nil
+func (c *Client) DeleteClient() {
+	c = nil
 }
 
 func (c *Client) get(url string, pattern interface{}) error {
